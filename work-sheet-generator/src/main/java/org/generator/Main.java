@@ -12,3 +12,9 @@ public class Main {
 
     }
 }
+
+
+public class Student()
+{
+    
+}
