@@ -12,12 +12,11 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 
 public class ExcelService {
-    private static final String FILE_PATH = "grupe-an-III-AIA-2024-2025.xls";
+    private static final String FILE_PATH = "grupe-an-III-AIA-2024_2025.xls";
 
     public void readExcel() {
         List<Student> students = new ArrayList<>();
 
-        //Factory<Object> XSSFWorkbookFactory = null;
         try (InputStream fis = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
              Workbook workbook;
             if (FILE_PATH.endsWith(".xls")) {
@@ -27,18 +26,18 @@ public class ExcelService {
             workbook = new XSSFWorkbook(fis); // Fișier .xlsx
         } else {
                 System.err.println("Unsupported file format: " + FILE_PATH);
-                return; // Exit if the file format is not supported.
+                return;
             }
 
             Sheet sheet = workbook.getSheetAt(0); // Prima foaie a Excelului
 
             // Alternativă la for clasica
-            IntStream.rangeClosed(1, sheet.getLastRowNum()) // Sarim peste antet (rând 0)
+            IntStream.rangeClosed(10, sheet.getLastRowNum()) // Sarim peste antet (rând 0)
                     .mapToObj(sheet::getRow) // Convertim indexul intr-un rand
                     .filter(Objects::nonNull) // Evitam randurile nule
                     .forEach(row -> {
-                        Cell groupCell = row.getCell(1); // A doua coloana (index 1)
-                        Cell studentCell = row.getCell(8); // A noua coloana (index 8)
+                        Cell groupCell = row.getCell(8); // A doua coloana (index 1)
+                        Cell studentCell = row.getCell(1); // A noua coloana (index 8)
 
                         if (groupCell != null && studentCell != null) {
                             String group = groupCell.getStringCellValue().trim();
@@ -55,5 +54,6 @@ public class ExcelService {
 
         // Afisam studentii citiți
         students.forEach(System.out::println);
+
     }
 }
