@@ -4,15 +4,15 @@ import java.util.List;
 
 public class GrupaDTO {
     private String cod;
-    private List<Student> studenti;
+    private List<StudentDTO> studenti;
     private Integer an;
-    private Student sefDeGrupa;
+    private StudentDTO sefDeGrupa;
 
     // Constructor fara argumente
     public GrupaDTO() {}
 
     // Constructor
-    public GrupaDTO(String cod, List<Student> studenti, Integer an, Student sefDeGrupa) {
+    public GrupaDTO(String cod, List<StudentDTO> studenti, Integer an, StudentDTO sefDeGrupa) {
         this.cod = cod;
         this.studenti = studenti;
         this.an = an;
@@ -28,11 +28,11 @@ public class GrupaDTO {
         this.cod = cod;
     }
 
-    public List<Student> getStudenti() {
+    public List<StudentDTO> getStudenti() {
         return studenti;
     }
 
-    public void setStudenti(List<Student> studenti) {
+    public void setStudenti(List<StudentDTO> studenti) {
         this.studenti = studenti;
     }
 
@@ -44,11 +44,11 @@ public class GrupaDTO {
         this.an = an;
     }
 
-    public Student getSefDeGrupa() {
+    public StudentDTO getSefDeGrupa() {
         return sefDeGrupa;
     }
 
-    public void setSefDeGrupa(Student sefDeGrupa) {
+    public void setSefDeGrupa(StudentDTO sefDeGrupa) {
         this.sefDeGrupa = sefDeGrupa;
     }
 }
