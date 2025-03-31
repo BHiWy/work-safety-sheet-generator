@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 
 public class ExcelService {
-    private static final String FILE_PATH = "../resources/grupe-an-III-AIA-2024-2025.xls";
+    private static final String FILE_PATH = "resources/grupe-an-III-AIA-2024-2025.xls";
 
     public void readExcel() {
         List<Student> students = new ArrayList<>();
