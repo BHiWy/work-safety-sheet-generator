@@ -1,14 +1,20 @@
+
 package org.generator;
+
+
+
+import org.generator.service.ExcelService;
+
+
+//import java.io.FileNotFoundException;
+
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
-        System.out.println("Hello, Gen!");
-        System.out.println("alexandra");
-        System.out.println("Andrei");
-        System.out.println("Andrei");
-        System.out.println("Andrei din nou");
-        System.out.println("Test");
+        //System.out.println("Hello, World!");
+        ExcelService excelService = new ExcelService();
+        excelService.readExcel();
+
     }
 }
 
