@@ -6,7 +6,7 @@ public class Student {
     private Integer an;
     private String email;
     private String initialaTatalui;
-
+    private String group;
     // Constructor fara parametrii
     public Student() {
 
@@ -20,6 +20,13 @@ public class Student {
         this.email = email;
         this.initialaTatalui = initialaTatalui;
     }
+
+    public Student(String nume, String group)
+    {
+        this.nume=nume;
+        this.group=group;
+    }
+
 
     // Setteri si Getteri
 

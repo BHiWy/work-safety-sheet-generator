@@ -14,6 +14,7 @@ import java.util.stream.IntStream;
 public class ExcelService {
     private static final String FILE_PATH = "grupe-an-III-AIA-2024_2025.xls";
 
+
     public void readExcel() {
         List<Student> students = new ArrayList<>();
 
