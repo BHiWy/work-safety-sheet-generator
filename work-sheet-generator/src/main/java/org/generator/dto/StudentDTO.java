@@ -1,4 +1,4 @@
-package dto;
+package org.generator.dto;
 
 public class StudentDTO {
     private String nume;

@@ -1,4 +1,4 @@
-package dto;
+package org.generator.dto;
 
 import java.util.List;
 

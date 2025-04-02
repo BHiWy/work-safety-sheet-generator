@@ -1,20 +1,20 @@
-package entities;
+package org.generator.dto;
 
 import java.util.List;
 
-public class Profesor {
+public class ProfesorDTO {
     private String nume;
     private List<String> cursuri;
     private List<String> email;
     private String functie;
 
     // Constructor fara parametrii
-    public Profesor() {
+    public ProfesorDTO() {
 
     }
 
     // Constructor cu parametrii
-    public Profesor(String nume, List<String> cursuri, List<String> email, String functie) {
+    public ProfesorDTO(String nume, List<String> cursuri, List<String> email, String functie) {
         this.nume = nume;
         this.cursuri = cursuri;
         this.email = email;
@@ -54,4 +54,3 @@ public class Profesor {
         this.functie = functie;
     }
 }
-

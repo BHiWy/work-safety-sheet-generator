@@ -1,4 +1,4 @@
-package entities;
+package org.generator.entities;
 
 public class Student {
     private String nume;
