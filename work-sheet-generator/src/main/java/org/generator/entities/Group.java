@@ -1,73 +1,37 @@
 package org.generator.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+
 import java.util.ArrayList;
 
 @Entity
-@Table(name="GROUPS")
+@Table(name="UNI_GROUPS")
 @Data
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Group {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-    @Column(name="code", nullable=false)
+    @Column(name = "code", nullable = false)
     private String code;
 
-    @OneToMany(fetch =FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name="REF_STUDENTS")
-    private ArrayList<Student> students;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "UNI_GROUPS_STUDENTS",
+            joinColumns = @JoinColumn(name = "GROUP_ID"),
+            inverseJoinColumns = @JoinColumn(name = "STUDENTS_ID")
+    )
+    private ArrayList<Student> students = new ArrayList<>();
 
-    @Column(name="YEAR")
+    @Column(name = "YEAR")
     private Integer year;
 
-
-    @OneToOne(fetch =FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinColumn(name="GROUP_LEADER", referencedColumnName = "id")
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "GROUP_LEADER", referencedColumnName = "id")
     private Student groupLeader;
-
-    // Constructor fara argumente
-    public Group() {}
-
-    // Constructor
-    public Group(String code, ArrayList<Student> students, Integer year, Student groupLeader) {
-        this.code = code;
-        this.students = students;
-        this.year = year;
-        this.groupLeader = groupLeader;
-    }
-
-    // Gettere si settere
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public ArrayList<Student> getStudents() {
-        return students;
-    }
-
-    public void setStudents(ArrayList<Student> students) {
-        this.students = students;
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
-    }
-
-    public Student getGrorpLeader() {
-        return groupLeader;
-    }
-
-    public void setGroupLeader(Student groupLeader) {
-        this.groupLeader = groupLeader;
-    }
 }

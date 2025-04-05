@@ -2,6 +2,7 @@ package org.generator;
 
 import org.generator.dto.GroupDTO;
 import org.generator.dto.StudentDTO;
+import org.generator.mapper.StudentMapperImpl;
 import org.generator.services.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -16,14 +17,16 @@ import java.util.ArrayList;
 public class Generator implements CommandLineRunner {
     private final StudentService studentService;
     private final GroupService groupService;
+    private final StudentMapperImpl studentMapperImpl;
 
     @Autowired
     Generator(
             StudentService studService,
-            GroupService groupService
-    ){
+            GroupService groupService,
+            StudentMapperImpl studentMapperImpl){
         this.studentService = studService;
         this.groupService = groupService;
+        this.studentMapperImpl = studentMapperImpl;
     }
 
     public static void main(String[] args) {
@@ -43,14 +46,15 @@ public class Generator implements CommandLineRunner {
         student1.setLastName("Doe");
         student1.setEmail("john.doe@gmail.com");
         student1.setPaternalInitial("A");
-        this.studentService.save(student1);
+
+        this.studentService.save(studentMapperImpl.toEntity(student1));
 
         StudentDTO student2 = new StudentDTO();
         student2.setFirstName("Alma");
         student2.setLastName("Ora");
         student2.setEmail("alma@gmail.com");
         student2.setPaternalInitial("F");
-        this.studentService.save(student2);
+        this.studentService.save(studentMapperImpl.toEntity(student2));
 
         ArrayList<StudentDTO> students = new ArrayList<StudentDTO>();
         students.add(student1);
