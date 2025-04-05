@@ -1,4 +1,4 @@
-package entities;
+package org.generator.classes;
 
 import java.util.List;
 
