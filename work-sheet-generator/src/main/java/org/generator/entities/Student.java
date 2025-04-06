@@ -3,8 +3,6 @@ package org.generator.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
-
 @Entity
 @Table(name="STUDENTS")
 @Data
@@ -12,24 +10,24 @@ import java.io.Serializable;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Student implements Serializable {
+public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "first_name")
+    @Column(name = "FIRST_NAME")
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "LAST_NAME")
     private String lastName;
 
-    @Column(name = "year")
+    @Column(name = "YEAR")
     private Integer year;
 
-    @Column(name = "email")
+    @Column(name = "EMAIL")
     private String email;
 
-    @Column(name = "paternal_initial")
+    @Column(name = "PATERNAL_INITIAL")
     private String paternalInitial;
 }

@@ -11,7 +11,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 
 @Service
 public class GroupService {
@@ -21,7 +20,7 @@ public class GroupService {
 
     private final GroupMapper groupMapper;
     private final StudentMapper studentMapper;
-    private final StudentService studentService; // Injectează StudentService
+    private final StudentService studentService;
 
     public GroupService(GroupMapper groupMapper, StudentMapper studentMapper, StudentService studentService) {
         this.groupMapper = groupMapper;
@@ -32,21 +31,19 @@ public class GroupService {
     @Transactional
     public void save(GroupDTO groupDTO) {
         Group groupEntity = groupMapper.toEntity(groupDTO);
-        ArrayList<Student> studentsToPersist = new ArrayList<>();
 
         if (groupDTO.getStudents() != null && !groupDTO.getStudents().isEmpty()) {
             for (StudentDTO studentDTO : groupDTO.getStudents()) {
                 Student student = studentMapper.toEntity(studentDTO);
-                studentService.save(student); // Salvează fiecare student individual
-                studentsToPersist.add(student);
+                studentService.save(student); // Salveaza fiecare student individual
+                groupEntity.getStudents().add(student); // Adauga studentul in groupa
             }
-            groupEntity.setStudents(studentsToPersist);
         }
 
         if (groupDTO.getGroupLeader() != null) {
             StudentDTO groupLeaderDTO = groupDTO.getGroupLeader();
             Student groupLeaderEntity = studentMapper.toEntity(groupLeaderDTO);
-            studentService.save(groupLeaderEntity); // Salvează liderul de grup individual
+            studentService.save(groupLeaderEntity); // Salveaza liderul de grup individual
             groupEntity.setGroupLeader(groupLeaderEntity);
         }
 

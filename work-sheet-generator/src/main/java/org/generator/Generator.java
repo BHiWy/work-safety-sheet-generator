@@ -34,7 +34,7 @@ public class Generator implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         newStudent();
     }
 
@@ -56,7 +56,7 @@ public class Generator implements CommandLineRunner {
         student2.setPaternalInitial("F");
         this.studentService.save(studentMapperImpl.toEntity(student2));
 
-        ArrayList<StudentDTO> students = new ArrayList<StudentDTO>();
+        ArrayList<StudentDTO> students = new ArrayList<>();
         students.add(student1);
         students.add(student2);
 

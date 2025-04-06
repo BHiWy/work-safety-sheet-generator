@@ -3,7 +3,7 @@ package org.generator.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="UNI_GROUPS")
@@ -13,11 +13,12 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Group {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "code", nullable = false)
+    @Column(name = "CODE", nullable = false)
     private String code;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -26,7 +27,7 @@ public class Group {
             joinColumns = @JoinColumn(name = "GROUP_ID"),
             inverseJoinColumns = @JoinColumn(name = "STUDENTS_ID")
     )
-    private ArrayList<Student> students = new ArrayList<>();
+    private List<Student> students;
 
     @Column(name = "YEAR")
     private Integer year;
