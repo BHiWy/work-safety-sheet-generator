@@ -1,9 +1,12 @@
 package org.generator;
 
 import org.generator.dto.GroupDTO;
+import org.generator.dto.ProfessorDTO;
 import org.generator.dto.StudentDTO;
+import org.generator.mapper.ProfessorMapper;
 import org.generator.mapper.StudentMapperImpl;
 import org.generator.services.GroupService;
+import org.generator.services.ProfessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,21 +15,27 @@ import org.springframework.boot.CommandLineRunner;
 import org.generator.services.StudentService;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootApplication
 public class Generator implements CommandLineRunner {
     private final StudentService studentService;
     private final GroupService groupService;
+    private final ProfessorService professorService;
     private final StudentMapperImpl studentMapperImpl;
+    private final ProfessorMapper professorMapper;
 
     @Autowired
     Generator(
             StudentService studService,
             GroupService groupService,
-            StudentMapperImpl studentMapperImpl){
+            ProfessorService profService,
+            StudentMapperImpl studentMapperImpl, ProfessorMapper professorMapper){
         this.studentService = studService;
         this.groupService = groupService;
+        this.professorService = profService;
         this.studentMapperImpl = studentMapperImpl;
+        this.professorMapper = professorMapper;
     }
 
     public static void main(String[] args) {
@@ -72,5 +81,17 @@ public class Generator implements CommandLineRunner {
         this.groupService.save(group);
 
         System.out.println("salvat");
+
+        ProfessorDTO professor = new ProfessorDTO();
+        professor.setFullName("Aleodor Ioan");
+        professor.setRank("Lector Universitar");
+        professor.setEmail("aleodorio@gmail.com");
+        List<String> courses = new ArrayList<>();
+        courses.add("Limbaj assembly");
+        courses.add("C++");
+        courses.add("MAP");
+        professor.setCourses(courses);
+
+        this.professorService.save(professorMapper.toEntity(professor));
     }
 }
