@@ -1,6 +1,6 @@
 
 
-import org.generator.service.ExcelService;
+import org.generator.services.ExcelService;
 import org.junit.jupiter.api.Test;
 import java.io.InputStream;
 import static org.junit.jupiter.api.Assertions.*;

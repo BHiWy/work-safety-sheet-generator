@@ -1,9 +1,14 @@
-package org.generator.service;
+package org.generator.services;
 
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.generator.entities.Student;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -14,9 +19,15 @@ import java.util.stream.IntStream;
 /**
  *
  */
+@Transactional
+@Service
+@Slf4j
 public class ExcelService {
     private static final String FILE_PATH = "files/grupe-an-III-AIA-2024_2025.xls";
 
+    @Autowired
+    public void ProfessorService(StudentService studentService) {
+    }
 
     public void readExcel() {
         List<Student> students = new ArrayList<>();
@@ -46,7 +57,8 @@ public class ExcelService {
                         if (groupCell != null && studentCell != null) {
                             String group = groupCell.getStringCellValue().trim();
                             String student = studentCell.getStringCellValue().trim();
-                            students.add(new Student(student, group));
+                            // !!!!! rezolvare cu db save student
+//                            students.add(new Student(student, group));
                         }
                     });
 

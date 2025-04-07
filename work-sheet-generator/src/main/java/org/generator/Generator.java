@@ -5,6 +5,7 @@ import org.generator.dto.ProfessorDTO;
 import org.generator.dto.StudentDTO;
 import org.generator.mapper.ProfessorMapper;
 import org.generator.mapper.StudentMapperImpl;
+import org.generator.services.ExcelService;
 import org.generator.services.GroupService;
 import org.generator.services.ProfessorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.List;
 public class Generator implements CommandLineRunner {
     private final StudentService studentService;
     private final GroupService groupService;
+    private final ExcelService excelService;
     private final ProfessorService professorService;
     private final StudentMapperImpl studentMapperImpl;
     private final ProfessorMapper professorMapper;
@@ -30,12 +32,15 @@ public class Generator implements CommandLineRunner {
             StudentService studService,
             GroupService groupService,
             ProfessorService profService,
-            StudentMapperImpl studentMapperImpl, ProfessorMapper professorMapper){
+            ExcelService excelService,
+            StudentMapperImpl studentMapperImpl,
+            ProfessorMapper professorMapper){
         this.studentService = studService;
         this.groupService = groupService;
         this.professorService = profService;
         this.studentMapperImpl = studentMapperImpl;
         this.professorMapper = professorMapper;
+        this.excelService = excelService;
     }
 
     public static void main(String[] args) {
@@ -44,7 +49,11 @@ public class Generator implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        newStudent();
+        // verifying saving in db
+//        newStudent();
+
+        //verifying reading excel
+        excelService.readExcel();
     }
 
     public void newStudent(){
