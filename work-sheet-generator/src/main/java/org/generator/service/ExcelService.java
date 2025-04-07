@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
+/**
+ *
+ */
 public class ExcelService {
-    private static final String FILE_PATH = "grupe-an-III-AIA-2024_2025.xls";
+    private static final String FILE_PATH = "files/grupe-an-III-AIA-2024_2025.xls";
 
 
     public void readExcel() {
@@ -30,15 +33,15 @@ public class ExcelService {
                 return;
             }
 
-            Sheet sheet = workbook.getSheetAt(0); // Prima foaie a Excelului
+            Sheet sheet = workbook.getSheetAt(0); // First sheet of the Excel file
 
-            // Alternativă la for clasica
-            IntStream.rangeClosed(10, sheet.getLastRowNum()) // Sarim peste antet (rând 0)
-                    .mapToObj(sheet::getRow) // Convertim indexul intr-un rand
-                    .filter(Objects::nonNull) // Evitam randurile nule
+            // Alternative to the classic for loop
+            IntStream.rangeClosed(10, sheet.getLastRowNum()) // Skip the header (row 0)
+                    .mapToObj(sheet::getRow) // Convert the index to a row
+                    .filter(Objects::nonNull) // Avoid null rows
                     .forEach(row -> {
-                        Cell groupCell = row.getCell(8); // A doua coloana (index 1)
-                        Cell studentCell = row.getCell(1); // A noua coloana (index 8)
+                        Cell groupCell = row.getCell(8); // The second column (index 1)
+                        Cell studentCell = row.getCell(1); // Ninth column (index 8)
 
                         if (groupCell != null && studentCell != null) {
                             String group = groupCell.getStringCellValue().trim();
@@ -53,7 +56,7 @@ public class ExcelService {
             return;
         }
 
-        // Afisam studentii citiți
+        // Display the read students
         students.forEach(System.out::println);
 
     }
