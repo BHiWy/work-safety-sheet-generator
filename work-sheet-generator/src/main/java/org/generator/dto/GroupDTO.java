@@ -1,20 +1,21 @@
 package org.generator.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
+
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentDTO {
+public class GroupDTO {
 
-    private String firstName;
-    private String lastName;
+    private String code;
+    private List<StudentDTO> students;
     private Integer year;
-    private String email;
-    private String paternalInitial;
+    private StudentDTO groupLeader;
 }

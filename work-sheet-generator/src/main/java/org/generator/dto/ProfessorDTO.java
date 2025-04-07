@@ -1,20 +1,20 @@
 package org.generator.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentDTO {
+public class ProfessorDTO {
 
-    private String firstName;
-    private String lastName;
-    private Integer year;
+    private String fullName;
+    private List<String> courses;
     private String email;
-    private String paternalInitial;
+    private String rank;
 }
