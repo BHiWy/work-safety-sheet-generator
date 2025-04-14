@@ -11,13 +11,16 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.IntStream;
 
 /**
- *
+ *This service class (`ExcelService`) is responsible for reading data
+ *  from Excel files (.xls or .xlsx). The `readExcel()` method accesses the
+ *  file specified by `FILE_PATH`, iterates through rows starting from the 11th,
+ *  and extracts information about the group (column 9), student (column 2),
+ *  and group leader (column 8). If the group leader cell is not empty, it is
+ *  displayed. The read data (currently only displayed) could be further used for saving into a database.
  */
 @Transactional
 @Service
@@ -30,6 +33,7 @@ public class ExcelService {
     }
 
     public void readExcel() {
+
         List<Student> students = new ArrayList<>();
 
         try (InputStream fis = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
@@ -52,15 +56,22 @@ public class ExcelService {
                     .filter(Objects::nonNull) // Avoid null rows
                     .forEach(row -> {
                         Cell groupCell = row.getCell(8); // The second column (index 1)
-                        Cell studentCell = row.getCell(1); // Ninth column (index 8)
+                        Cell studentCell = row.getCell(1);// Ninth column (index 8)
+                        Cell sefGrupaCell= row.getCell(7);
 
                         if (groupCell != null && studentCell != null) {
                             String group = groupCell.getStringCellValue().trim();
                             String student = studentCell.getStringCellValue().trim();
                             // !!!!! rezolvare cu db save student
 //                            students.add(new Student(student, group));
+                            String sefGrupa=" ";
+                            if(sefGrupaCell!=null) {
+                                sefGrupa = sefGrupaCell.getStringCellValue().trim();
+                            }
+                             System.out.println("Student: "+ student +" , Grupa: " + group + ", " +sefGrupa);
                         }
                     });
+
 
         } catch (IOException | NullPointerException e) {
             System.err.println("Error reading Excel file: " + e.getMessage());
