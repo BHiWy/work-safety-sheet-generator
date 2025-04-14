@@ -72,4 +72,23 @@ public class ExcelService {
         students.forEach(System.out::println);
 
     }
+
+    /**
+     * Extrage anul de studiu din codul grupei.
+     * Exemplu: pentru "1304A", va returna 3.
+     */
+    public int extractYear(String groupCode) {
+        if (groupCode == null || groupCode.length() < 2) {
+            throw new IllegalArgumentException("Codul grupei este invalid: " + groupCode);
+        }
+
+        char secondChar = groupCode.charAt(1);
+
+        if (!Character.isDigit(secondChar)) {
+            throw new IllegalArgumentException("A doua poziție din codul grupei nu este o cifră: " + groupCode);
+        }
+
+        return Character.getNumericValue(secondChar);
+    }
+
 }
