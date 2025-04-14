@@ -15,7 +15,13 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 /**
- *
+ *This service class (`ExcelService`) is responsible for reading data
+ *  from Excel files (.xls or .xlsx). The `readExcel()` method accesses the
+ *  file specified by `FILE_PATH`, iterates through rows starting from the 11th,
+ *  and extracts information about the group (column 9), student (column 2),
+ *  and group leader (column 8). If the group leader cell is not empty, it is
+ *  displayed. The read data (currently only
+ *  displayed) could be further used for saving into a database.
  */
 @Transactional
 @Service
