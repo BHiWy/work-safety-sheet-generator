@@ -20,8 +20,7 @@ import java.util.stream.IntStream;
  *  file specified by `FILE_PATH`, iterates through rows starting from the 11th,
  *  and extracts information about the group (column 9), student (column 2),
  *  and group leader (column 8). If the group leader cell is not empty, it is
- *  displayed. The read data (currently only
- *  displayed) could be further used for saving into a database.
+ *  displayed. The read data (currently only displayed) could be further used for saving into a database.
  */
 @Transactional
 @Service
