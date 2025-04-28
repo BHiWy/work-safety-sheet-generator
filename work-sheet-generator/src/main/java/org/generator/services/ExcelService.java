@@ -85,7 +85,7 @@ public class    ExcelService {
     }
 
     /**
-     * Extracts the year of study from the group code.
+     * Extracts the year of study from the group-code.
      * Example: for "1304A", it will return 3.
      */
     public int extractYear(String groupCode) {
