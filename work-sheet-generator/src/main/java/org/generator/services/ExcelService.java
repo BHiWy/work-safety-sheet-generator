@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 @Transactional
 @Service
 @Slf4j
-public class ExcelService {
+public class    ExcelService {
     private static final String FILE_PATH = "files/grupe-an-III-AIA-2024_2025.xls";
 
     @Autowired
@@ -85,8 +85,8 @@ public class ExcelService {
     }
 
     /**
-     * Extrage anul de studiu din codul grupei.
-     * Exemplu: pentru "1304A", va returna 3.
+     * Extracts the year of study from the group-code.
+     * Example: for "1304A", it will return 3.
      */
     public int extractYear(String groupCode) {
         if (groupCode == null || groupCode.length() < 2) {
