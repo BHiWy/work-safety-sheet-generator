@@ -111,6 +111,7 @@ public class ExcelService {
             System.out.println("Student is null or empty");
             return "";
         }
+
         String[] parts = student.trim().split("\\s+");
         if (parts.length < 2) {
             return "";
