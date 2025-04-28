@@ -35,6 +35,7 @@ public class ExcelService {
     public void readExcel() {
 
         List<Student> students = new ArrayList<>();
+        List<String> email = new ArrayList<>();
 
         try (InputStream fis = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
              Workbook workbook;
@@ -68,7 +69,9 @@ public class ExcelService {
                             if(sefGrupaCell!=null) {
                                 sefGrupa = sefGrupaCell.getStringCellValue().trim();
                             }
+
                              System.out.println("Student: "+ student +" , Grupa: " + group + ", " +sefGrupa);
+                            email.add(createEmail(student));
                         }
                     });
 
@@ -81,6 +84,7 @@ public class ExcelService {
 
         // Display the read students
         students.forEach(System.out::println);
+        //email.forEach(System.out::println);
 
     }
 
@@ -100,6 +104,45 @@ public class ExcelService {
         }
 
         return Character.getNumericValue(secondChar);
+    }
+
+    public String createEmail(String student){
+        if (student == null || student.trim().isEmpty()) {
+            System.out.println("Student is null or empty");
+            return "";
+        }
+        String[] parts = student.trim().split("\\s+");
+        if (parts.length < 2) {
+            return "";
+        }
+        String lastName = parts[0].replaceAll("[.,]", "");
+        StringBuilder firstNameParts = new StringBuilder();
+        boolean startedFirstName = false;
+
+        for (int i = 1; i < parts.length; i++) {
+            String currentPart = parts[i].trim();
+            if (currentPart.matches("([A-Z]\\.)+")) {
+                continue;
+            }
+
+                String cleanedPart = currentPart.replaceAll("[.,]", "");
+                if (!cleanedPart.isEmpty()) {
+                    if (startedFirstName) {
+                        firstNameParts.append("-");
+                    }
+                    firstNameParts.append(cleanedPart);
+                    startedFirstName= true;
+                }
+            }
+
+        if (firstNameParts.isEmpty()) {
+            return "";
+        }
+
+        String email = firstNameParts + "." + lastName + "@student.tuiasi.ro";
+        System.out.println("Email generat: " + email);
+        return email;
+
     }
 
 }
