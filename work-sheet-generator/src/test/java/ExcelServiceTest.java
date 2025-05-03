@@ -1,72 +1,91 @@
-
-
 import org.apache.poi.ss.usermodel.*;
+import lombok.extern.slf4j.Slf4j;
 import org.generator.services.ExcelService;
 import org.junit.jupiter.api.Test;
+import org.springframework.stereotype.Service;
+
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+/**
+ * Unit tests for the {@link ExcelService} class, focusing on verifying
+ * Excel file reading capabilities, including presence of required columns,
+ * empty cell checks, and group leader presence.
+ */
+@Service
+@Slf4j
 public class ExcelServiceTest {
+    private final ExcelService excelService;
+
+    public ExcelServiceTest(ExcelService excelService) {
+        this.excelService = excelService;
+    }
 
     private static final String FILE_PATH = "files/grupe-an-III-AIA-2024_2025.xls";
 
+    /**
+     * Tests reading a valid Excel file.
+     * Ensures that the file exists and no exceptions are thrown during processing.
+     */
     @Test
-    public void testReadExcel_validFile() {
-        // Verificam ca fisierul de test exista in resources
+    public void testReadExcelValidFile() {
+        // Ensure that the test file exists in resources
         try (InputStream mockInputStream = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
-            assertNotNull(mockInputStream, "Fisierul nu a fost gasit!");
-
-            // Cream instanta serviciului
-            ExcelService excelService = new ExcelService();
-
-            // Apelam metoda de citire
+            assertNotNull(mockInputStream, "File not found!");
+            // Call the read method
             excelService.readExcel();
 
-            // Ne asiguram ca nu au aparut erori
-
+            // Ensure no errors occurred
         } catch (Exception e) {
-            fail("Testul a esuat din cauza unei erori: " + e.getMessage());
+            fail("Test failed due to error: " + e.getMessage());
         }
     }
 
+    /**
+     * Tests reading an invalid Excel file.
+     * Verifies that no unexpected errors occur if the file is missing.
+     */
     @Test
-    public void testReadExcel_invalidFile() {
-        // Testam cazul in care fișierul nu exista
+    public void testReadExcelInvalidFile() {
+        // Test the case when the file does not exist
         try (InputStream mockInputStream = getClass().getClassLoader().getResourceAsStream("excel/fisier_inexistent_123.xlsx")) {
-            assertNull(mockInputStream, "Fisierul nu ar trebui sa existe!");
+            assertNull(mockInputStream, "File should not exist!");
 
-            ExcelService excelService = new ExcelService();
             excelService.readExcel();
 
-            // Verificam ca nu a aparut nicio eroare neasteptata
+            // Ensure no unexpected error occurred
         } catch (Exception e) {
-            fail("Testul a esuat din cauza unei erori: " + e.getMessage());
+            fail("Test failed due to error: " + e.getMessage());
         }
     }
 
+    /**
+     * Tests reading an Excel file that exists but contains no relevant data.
+     * Verifies that no crash occurs even if the file is empty.
+     */
     @Test
-    public void testReadExcel_emptyFile() {
-        // Testam cazul in care fisierul exista dar nu contine date relevante
+    public void testReadExcelEmptyFile() {
+        // Test the case when the file exists but contains no relevant data
         try (InputStream mockInputStream = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
-            assertNotNull(mockInputStream, "Fisierul gol nu a fost gasit!");
+            assertNotNull(mockInputStream, "Empty file not found!");
 
-            ExcelService excelService = new ExcelService();
             excelService.readExcel();
 
-            // Aici, doar verificam ca nu a aparut nicio eroare, iar fisierul gol nu a cauzat un crash
+            // Just verify no error occurred and that the empty file did not cause a crash
         } catch (Exception e) {
-            fail("Testul a esuat din cauza unei erori: " + e.getMessage());
+            fail("Test failed due to error: " + e.getMessage());
         }
     }
 
+    /**
+     * Tests whether there are any empty cells in the "Student" or "Group" columns.
+     * The check stops when a null or blank cell is found in the "Nr." column.
+     */
     @Test
-    public void testExcelStudentOrGrupaEmpty() {
+    public void testExcelStudentOrGroupEmpty() {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
-            assertNotNull(inputStream, "Fisierul Excel nu a fost gasit!");
+            assertNotNull(inputStream, "Excel file not found!");
 
             Workbook workbook = WorkbookFactory.create(inputStream);
             Sheet sheet = workbook.getSheetAt(0);
@@ -75,8 +94,8 @@ public class ExcelServiceTest {
             int grupaColIndex = -1;
             int nrColIndex = -1;
 
-            // Luam prima linie ca header
-            Row headerRow = sheet.getRow(8); // Linia 9 in Excel (index 8 in Java)
+            // Get the header row (Excel row 9 = index 8)
+            Row headerRow = sheet.getRow(8);
             for (Cell cell : headerRow) {
                 String value = cell.getStringCellValue();
                 if (value.equalsIgnoreCase("Nume si prenume")) {
@@ -88,24 +107,23 @@ public class ExcelServiceTest {
                 }
             }
 
-            assertTrue(studentColIndex != -1, "Coloana 'Student' nu a fost gasita!");
-            assertTrue(grupaColIndex != -1, "Coloana 'Grupa' nu a fost gasita!");
-            assertTrue(nrColIndex != -1, "Coloana 'Nr' nu a fost gasita!");
+            assertTrue(studentColIndex != -1, "'Student' column not found!");
+            assertTrue(grupaColIndex != -1, "'Group' column not found!");
+            assertTrue(nrColIndex != -1, "'Nr' column not found!");
 
             boolean hasEmpty = false;
 
-            // Iteram de la linia 9 (index 8 in Java) pana la prima valoare null in coloana 'Nr'
-            for (int i = 9; i <= sheet.getLastRowNum(); i++) { // Linia 9 in Excel (index 8 in Java)
+            // Iterate from row 10 to end, stopping at first null in "Nr." column
+            for (int i = 9; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) continue;
 
                 Cell nrCell = row.getCell(nrColIndex);
                 if (nrCell == null || nrCell.getCellType() == CellType.BLANK) {
-                    // Daca intalnim o celula goala in coloana 'Nr', opriți iterația
-                    break;
+                    break; // Stop at first blank in "Nr." column
                 }
 
-                // Verificam daca exista celule goale in coloanele 'Student' sau 'Grupa'
+                // Check for empty cells in "Student" or "Group" columns
                 Cell studentCell = row.getCell(studentColIndex);
                 Cell grupaCell = row.getCell(grupaColIndex);
 
@@ -115,25 +133,21 @@ public class ExcelServiceTest {
                 }
             }
 
-            assertFalse(hasEmpty, "Exista celule goale in coloanele Student sau Grupa!");
+            assertFalse(hasEmpty, "Empty cells found in Student or Group columns!");
 
         } catch (Exception e) {
-            fail("Exceptie la citirea fisierului: " + e.getMessage());
+            fail("Exception while reading file: " + e.getMessage());
         }
     }
 
-    private boolean isCellEmpty(Cell cell) {
-        return cell == null || cell.getCellType() == CellType.BLANK ||
-                (cell.getCellType() == CellType.STRING && cell.getStringCellValue().trim().isEmpty());
-    }
-
-
-    // Next test: Verific daca o grupa are sau nu un sef de grupa.
-
+    /**
+     * Checks whether each group has a designated group leader ("șef de grupă").
+     * Groups are identified by "Nr." column starting at 1.
+     */
     @Test
-    public void testGrupaAreSefDeGrupa() {
+    public void testGroupHasGroupLeader() {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
-            assertNotNull(inputStream, "Fisierul Excel nu a fost gasit!");
+            assertNotNull(inputStream, "Excel file not found!");
 
             Workbook workbook = WorkbookFactory.create(inputStream);
             Sheet sheet = workbook.getSheetAt(0);
@@ -143,8 +157,8 @@ public class ExcelServiceTest {
             int nrColIndex = -1;
             int obsColIndex = -1;
 
-            // Luam prima linie ca header (linia 9 in Excel este index 8 in Java)
-            Row headerRow = sheet.getRow(8); // Presupunem ca header-ul este pe linia 9 (index 8)
+            // Get the header row (assumed to be at line 9 / index 8)
+            Row headerRow = sheet.getRow(8);
             for (Cell cell : headerRow) {
                 String value = cell.getStringCellValue();
                 if (value.equalsIgnoreCase("Nume si prenume")) {
@@ -158,38 +172,33 @@ public class ExcelServiceTest {
                 }
             }
 
-            // Asiguram ca toate coloanele necesare sunt gasite
-            assertTrue(studentColIndex != -1, "Coloana 'Student' nu a fost gasita!");
-            assertTrue(grupaColIndex != -1, "Coloana 'Grupa' nu a fost gasita!");
-            assertTrue(nrColIndex != -1, "Coloana 'Nr.' nu a fost gasita!");
-            assertTrue(obsColIndex != -1, "Coloana 'Obs.' nu a fost gasita!");
+            assertTrue(studentColIndex != -1, "'Student' column not found!");
+            assertTrue(grupaColIndex != -1, "'Group' column not found!");
+            assertTrue(nrColIndex != -1, "'Nr.' column not found!");
+            assertTrue(obsColIndex != -1, "'Obs.' column not found!");
 
             boolean allGroupsHaveSef = true;
             boolean groupHasSefDeGrupa = false;
 
-            // Iteram prin fiecare linie a fisierului
+            // Iterate through all rows
             for (int i = 9; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
-                if (row == null) continue; // Sarim peste liniile goale
+                if (row == null) continue;
 
-                // Extragem valoarea din coloana „Nr.” pentru a verifica daca este 1 (inceputul unei noi grupe)
                 Cell nrCell = row.getCell(nrColIndex);
                 if (nrCell == null || nrCell.getCellType() == CellType.BLANK) {
-                    // Daca intalnim o celula null sau goala in coloana „Nr.”, inseamna ca am ajuns la sfarsitul fisierului
-                    break; // Oprirea procesului
+                    break; // End of data
                 }
 
                 String nrValue = getCellValueAsString(nrCell);
-                if ("1".equals(nrValue)) { // Daca intalnim 1 in coloana „Nr.”, inseamna ca este inceputul unei noi grupe
+                if ("1".equals(nrValue)) {
                     if (!groupHasSefDeGrupa) {
-                        // Daca grupa anterioara nu avea sef de grupa
-                        System.out.println("Grupa de la linia " + i + " nu are sef de grupa!");
-                        allGroupsHaveSef = false; // Semnalam ca exista o grupa fara sef de grupa
+                        System.out.println("Group starting at line " + i + " has no group leader!");
+                        allGroupsHaveSef = false;
                     }
-                    groupHasSefDeGrupa = false; // Resetam pentru urmatoarea grupa
+                    groupHasSefDeGrupa = false;
                 }
 
-                // Verificam daca exista textul „sef de grupa” in coloana „Obs.”
                 Cell obsCell = row.getCell(obsColIndex);
                 if (obsCell != null) {
                     String obsValue = getCellValueAsString(obsCell);
@@ -199,20 +208,36 @@ public class ExcelServiceTest {
                 }
             }
 
-//             Verificam ultima grupa
-//            if (!groupHasSefDeGrupa) {
-//                System.out.println("Ultima grupa nu are sef de grupa!");
-//                allGroupsHaveSef = false;
-//            }
+            // Check last group (optional logic if needed)
+            // if (!groupHasSefDeGrupa) {
+            //     System.out.println("Last group has no group leader!");
+            //     allGroupsHaveSef = false;
+            // }
 
-            // Asiguram ca toate grupele au sef de grupa
-            assertTrue(allGroupsHaveSef, "Nu toate grupele au sef de grupa!");
+            assertTrue(allGroupsHaveSef, "Not all groups have a group leader!");
 
         } catch (Exception e) {
-            fail("Exceptie la citirea fisierului: " + e.getMessage());
+            fail("Exception while reading file: " + e.getMessage());
         }
     }
 
+    /**
+     * Utility method to check if a cell is empty.
+     *
+     * @param cell the cell to check
+     * @return true if the cell is empty, false otherwise
+     */
+    private boolean isCellEmpty(Cell cell) {
+        return cell == null || cell.getCellType() == CellType.BLANK ||
+                (cell.getCellType() == CellType.STRING && cell.getStringCellValue().trim().isEmpty());
+    }
+
+    /**
+     * Utility method to extract a cell value as a string, regardless of its type.
+     *
+     * @param cell the cell to read
+     * @return the string representation of the cell value
+     */
     private String getCellValueAsString(Cell cell) {
         if (cell == null) {
             return "";
@@ -228,8 +253,6 @@ public class ExcelServiceTest {
                 return "";
         }
     }
-
-
 }
 
 
