@@ -5,8 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.generator.dto.GroupDTO;
+import org.generator.dto.StudentDTO;
 import org.generator.entities.Student;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,135 +16,100 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 /**
- *This service class (`ExcelService`) is responsible for reading data
- *  from Excel files (.xls or .xlsx). The `readExcel()` method accesses the
- *  file specified by `FILE_PATH`, iterates through rows starting from the 11th,
- *  and extracts information about the group (column 9), student (column 2),
- *  and group leader (column 8). If the group leader cell is not empty, it is
- *  displayed. The read data (currently only displayed) could be further used for saving into a database.
+ * Service class responsible for reading and processing data from Excel files.
+ * The {@link #readExcel()} method handles the extraction of student and group information,
+ * ensuring uniqueness and associating group leaders. The processed data is then saved
+ * using the {@link GroupService}.
  */
 @Transactional
 @Service
 @Slf4j
-public class    ExcelService {
+public class ExcelService {
     private static final String FILE_PATH = "files/grupe-an-III-AIA-2024_2025.xls";
+    private final StudentService studentService;
+    private final GroupService groupService;
 
-    @Autowired
-    public void ProfessorService(StudentService studentService) {
+    public ExcelService(StudentService studentService, GroupService groupService) {
+        this.studentService = studentService;
+        this.groupService = groupService;
     }
 
+    /**
+     * Reads student and group data from an Excel file specified by {@link #FILE_PATH}.
+     * Extracts student names and group codes, creating unique {@link StudentDTO} and {@link #FILE_PATH} objects.
+     * Associates students with their groups and identifies group leaders.
+     * Saves all unique groups (and associated students) using {@link GroupService#save(GroupDTO)}.
+     * This method takes no parameters and returns no value.
+     */
+    @Transactional
     public void readExcel() {
-
-        List<Student> students = new ArrayList<>();
-        List<String> email = new ArrayList<>();
-
         try (InputStream fis = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
-             Workbook workbook;
+            Workbook workbook;
             if (FILE_PATH.endsWith(".xls")) {
-            workbook = new HSSFWorkbook(fis); // Fișier .xls
-        } else if (FILE_PATH.endsWith(".xlsx")) {
-
-            workbook = new XSSFWorkbook(fis); // Fișier .xlsx
-        } else {
+                workbook = new HSSFWorkbook(fis);
+            } else if (FILE_PATH.endsWith(".xlsx")) {
+                workbook = new XSSFWorkbook(fis);
+            } else {
                 System.err.println("Unsupported file format: " + FILE_PATH);
                 return;
             }
 
-            Sheet sheet = workbook.getSheetAt(0); // First sheet of the Excel file
+            Sheet sheet = workbook.getSheetAt(0);
 
-            // Alternative to the classic for loop
-            IntStream.rangeClosed(10, sheet.getLastRowNum()) // Skip the header (row 0)
-                    .mapToObj(sheet::getRow) // Convert the index to a row
-                    .filter(Objects::nonNull) // Avoid null rows
-                    .forEach(row -> {
-                        Cell groupCell = row.getCell(8); // The second column (index 1)
-                        Cell studentCell = row.getCell(1);// Ninth column (index 8)
-                        Cell sefGrupaCell= row.getCell(7);
+            Map<String, GroupDTO> uniqueGroups = new HashMap<>();
+            Map<String, StudentDTO> uniqueStudents = new HashMap<>();
 
-                        if (groupCell != null && studentCell != null) {
-                            String group = groupCell.getStringCellValue().trim();
-                            String student = studentCell.getStringCellValue().trim();
-                            // !!!!! rezolvare cu db save student
-//                            students.add(new Student(student, group));
-                            String sefGrupa=" ";
-                            if(sefGrupaCell!=null) {
-                                sefGrupa = sefGrupaCell.getStringCellValue().trim();
-                            }
+            IntStream.rangeClosed(9, sheet.getLastRowNum()).mapToObj(sheet::getRow).filter(Objects::nonNull).forEach(row -> {
+                if (row.getCell(8) != null && row.getCell(1) != null) {
+                    String groupCode = row.getCell(8).getStringCellValue().trim();
+                    String studentName = row.getCell(1).getStringCellValue().trim();
+                    String groupLeaderName = row.getCell(7) != null ? row.getCell(7).getStringCellValue().trim() : "";
 
-                             System.out.println("Student: "+ student +" , Grupa: " + group + ", " +sefGrupa);
-                            email.add(createEmail(student));
-                        }
+                    GroupDTO groupDTO = uniqueGroups.computeIfAbsent(groupCode, code -> {
+                        GroupDTO newGroup = new GroupDTO();
+                        newGroup.setCode(code);
+                        newGroup.setStudents(new ArrayList<>());
+                        newGroup.setYear(this.groupService.extractYear(groupCode));
+                        return newGroup;
                     });
 
+                    StudentDTO studentDTO = uniqueStudents.computeIfAbsent(studentName, name -> {
+                        StudentDTO dto = new StudentDTO();
+                        dto.setFirstName(name);
+                        dto.setEmail(this.studentService.createEmail(name));
+                        dto.setYear(this.groupService.extractYear(groupCode));
+                        return dto;
+                    });
+
+                    // Extract the name details and set them in the StudentDTO object
+                    Student extractedStudentDetails = this.studentService.extractNameDetails(studentName);
+                    studentDTO.setLastName(extractedStudentDetails.getLastName());
+                    studentDTO.setFirstName(extractedStudentDetails.getFirstName());
+                    studentDTO.setPaternalInitial(extractedStudentDetails.getPaternalInitial());
+
+                    // Associate the student with the group
+                    if (!groupDTO.getStudents().contains(studentDTO)) {
+                        groupDTO.getStudents().add(studentDTO);
+                    }
+
+                    // Check if the student is the group leader
+                    if (!groupLeaderName.isEmpty() && groupDTO.getGroupLeader() == null) {
+                        StudentDTO leaderDTO = uniqueStudents.get(groupLeaderName);
+                        if (leaderDTO != null) {
+                            groupDTO.setGroupLeader(leaderDTO);
+                        }
+                    }
+                }
+            });
+
+            // Save groups (and students by default)
+            for (GroupDTO groupDTO : uniqueGroups.values()) {
+                groupService.save(groupDTO);
+            }
 
         } catch (IOException | NullPointerException e) {
             System.err.println("Error reading Excel file: " + e.getMessage());
             e.printStackTrace();
-            return;
         }
-
-        // Display the read students
-        students.forEach(System.out::println);
-        //email.forEach(System.out::println);
-
     }
-
-    /**
-     * Extracts the year of study from the group-code.
-     * Example: for "1304A", it will return 3.
-     */
-    public int extractYear(String groupCode) {
-        if (groupCode == null || groupCode.length() < 2) {
-            throw new IllegalArgumentException("Codul grupei este invalid: " + groupCode);
-        }
-
-        char secondChar = groupCode.charAt(1);
-
-        if (!Character.isDigit(secondChar)) {
-            throw new IllegalArgumentException("A doua poziție din codul grupei nu este o cifră: " + groupCode);
-        }
-
-        return Character.getNumericValue(secondChar);
-    }
-
-    public String createEmail(String student){
-        if (student == null || student.trim().isEmpty()) {
-            System.out.println("Student is null or empty");
-            return "";
-        }
-
-        String[] parts = student.trim().split("\\s+");
-        if (parts.length < 2) {
-            return "";
-        }
-        String lastName = parts[0].replaceAll("[.,]", "");
-        StringBuilder firstNameParts = new StringBuilder();
-        boolean startedFirstName = false;
-
-        for (int i = 1; i < parts.length; i++) {
-            String currentPart = parts[i].trim();
-            if (currentPart.matches("([A-Z]\\.)+")) {
-                continue;
-            }
-
-                String cleanedPart = currentPart.replaceAll("[.,]", "");
-                if (!cleanedPart.isEmpty()) {
-                    if (startedFirstName) {
-                        firstNameParts.append("-");
-                    }
-                    firstNameParts.append(cleanedPart);
-                    startedFirstName= true;
-                }
-            }
-
-        if (firstNameParts.isEmpty()) {
-            return "";
-        }
-
-        String email = firstNameParts + "." + lastName + "@student.tuiasi.ro";
-        System.out.println("Email generat: " + email);
-        return email;
-
-    }
-
 }
