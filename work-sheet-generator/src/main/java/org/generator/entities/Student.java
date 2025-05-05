@@ -51,6 +51,6 @@ public class Student {
     /**
      * The paternal initial(s) of the student.
      */
-    @Column(name = "PATERNAL_INITIAL")
+    @Column(name = "PATERNAL_INITIAL",length = 30)
     private String paternalInitial;
 }
