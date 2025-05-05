@@ -1,0 +1,58 @@
+<div class="container align">
+  <h2>Aplicație de generare a fișei de protecția muncii</h2>
+  <p>Completați cu informațiile necesare:</p>
+
+  <form #form="ngForm" (ngSubmit)="generateWorksheetFile(form)">
+    <div class="grid-container">
+      <div class="form-group">
+        <label for="professorName" class="required">Numele profesorului:</label>
+        <input type="text" id="professorName" name="professorName" ngModel required>
+      </div>
+      <div class="form-group">
+        <label for="courseName" class="required">Denumire curs:</label>
+        <input type="text" id="courseName" name="courseName" ngModel required>
+      </div>
+      <div class="form-group">
+        <label for="assistantName" class="required">Numele profesorului asistent:</label>
+        <input type="text" id="assistantName" name="assistantName" ngModel required>
+      </div>
+      <div class="form-group">
+        <label for="place" class="required">Loc desfășurare:</label>
+        <input type="text" id="place" name="place" ngModel required>
+      </div>
+    </div>
+
+    <div class="selected-groups">
+      <label class="required">Grupele selectate:</label>
+      <div *ngFor="let group of selectedGroups; let i = index" class="selected-group-item">
+        <span>{{ group.code }}</span>
+        <button type="button" class="remove-button" (click)="removeGroup(i)">Elimină</button>
+      </div>
+      <div *ngIf="selectedGroups.length === 0">
+        Nicio grupă selectată.
+      </div>
+    </div>
+
+    <div class="add-group-container">
+      <select name="selectedGroups" [(ngModel)]="selectedGroupCodeToAdd">
+        <option value="" disabled [selected]="!selectedGroupCodeToAdd">Selectează o grupă</option>
+        <option *ngFor="let group of groups" [value]="group.code">{{ group.code }}</option>
+      </select>
+      <button type="button" class="add-group-button" (click)="addGroup()">Adaugă grupă</button>
+    </div>
+
+    <div *ngIf="errorMessages.length > 0" class="message-box">
+      <strong>Mesaje de eroare:</strong>
+      <ul>
+        <li *ngFor="let error of errorMessages">{{ error }}</li>
+      </ul>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="action-button save-button" (click)="deleteInfo()">Șterge informațiile</button>
+      <button type="submit" class="action-button generate-button">Generează fișa</button>
+    </div>
+
+    <p class="required-fields">(câmpurile cu * sunt obligatorii)</p>
+  </form>
+</div>

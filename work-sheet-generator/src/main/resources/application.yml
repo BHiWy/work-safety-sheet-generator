@@ -17,4 +17,4 @@ spring:
             org.hibernate.SQL: DEBUG
 
 server:
-  port: 8082
+  port: 8080

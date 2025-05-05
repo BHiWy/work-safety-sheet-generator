@@ -21,6 +21,11 @@ import java.util.regex.Pattern;
 public class StudentService {
     private final EntityManager entityManager;
 
+    /**
+     * Constructs a {@code ProfessorService} which injects the {@link EntityManager}}.
+     *
+     * @param entityManager the JPA entity manager used for database operations.
+     */
     @Autowired
     public StudentService(EntityManager entityManager) {
         this.entityManager = entityManager;

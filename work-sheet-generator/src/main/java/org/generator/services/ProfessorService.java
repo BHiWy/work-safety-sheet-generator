@@ -17,6 +17,11 @@ import org.springframework.stereotype.Service;
 public class ProfessorService {
     private final EntityManager entityManager;
 
+    /**
+     * Constructs a {@code ProfessorService} which injects the {@link EntityManager}.
+     *
+     * @param entityManager the JPA entity manager used for database operations.
+     */
     @Autowired
     public ProfessorService(EntityManager entityManager) {
         this.entityManager = entityManager;
