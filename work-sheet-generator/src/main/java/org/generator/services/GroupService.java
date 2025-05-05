@@ -2,11 +2,18 @@ package org.generator.services;
 
 import jakarta.transaction.Transactional;
 import org.generator.dto.GroupDTO;
+import org.generator.dto.StudentDTO;
 import org.generator.entities.Group;
+import org.generator.entities.Student;
 import org.generator.mapper.GroupMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+
+import org.generator.repository.GroupRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -20,9 +27,16 @@ public class GroupService {
     private EntityManager entityManager;
 
     private final GroupMapper groupMapper;
+    private final GroupRepository groupRepository;
 
-    public GroupService(GroupMapper groupMapper) {
+    /**
+     * Constructor for the {@code GroupService} which injects the {@link GroupMapper} and {@link GroupRepository}.
+     * @param groupMapper the mapper for converting between {@link GroupDTO} and {@link Group} entities.
+     * @param groupRepository the repository for {@link Group} entities.
+     */
+    public GroupService(GroupMapper groupMapper, GroupRepository groupRepository) {
         this.groupMapper = groupMapper;
+        this.groupRepository = groupRepository;
     }
 
     /**
@@ -33,8 +47,8 @@ public class GroupService {
      */
     @Transactional
     public void save(GroupDTO groupDTO) {
-    Group groupEntity = groupMapper.toEntity(groupDTO);
-    entityManager.persist(groupEntity);
+        Group groupEntity = groupMapper.toEntity(groupDTO);
+        entityManager.persist(groupEntity);
     }
 
     /**
@@ -56,5 +70,32 @@ public class GroupService {
         }
 
         return Character.getNumericValue(secondChar);
+    }
+
+    /**
+     * Retrieves a distinct list of {@link StudentDTO} objects belonging to a group
+     * with the specified group code.
+     * It queries the database using the {@code groupRepository} to find the students
+     * associated with the given group code and then maps each {@link Student} entity
+     * to its corresponding {@link StudentDTO}.
+     *
+     * @param groupCode the unique code of the group.
+     * @return a {@link List} of distinct {@link StudentDTO} objects belonging to the specified group.
+     */
+    public List<StudentDTO> findStudentsByGroupCode(String groupCode) {
+        return groupRepository.findDistinctStudentsByGroupCode(groupCode)
+                .stream()
+                .map(StudentDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all groups and returns them as a list of {@link GroupDTO}s.
+     * @return {List<{@link GroupDTO}>} A list containing all groups mapped to their DTO representation.
+     */
+    public List<GroupDTO> getAll(){
+        return groupRepository.findAll().stream()
+                .map(GroupDTO::new)
+                .collect(Collectors.toList());
     }
 }

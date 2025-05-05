@@ -29,6 +29,12 @@ public class ExcelService {
     private final StudentService studentService;
     private final GroupService groupService;
 
+    /**
+     * Constructor for {@code ExcelService} which injects the {@link GroupService} and {@link StudentService}.
+     *
+     * @param studentService the service responsible for handling student-related operations.
+     * @param groupService the service responsible for handling group-related operations.
+     */
     public ExcelService(StudentService studentService, GroupService groupService) {
         this.studentService = studentService;
         this.groupService = groupService;
@@ -94,7 +100,7 @@ public class ExcelService {
 
                     // Check if the student is the group leader
                     if (!groupLeaderName.isEmpty() && groupDTO.getGroupLeader() == null) {
-                        StudentDTO leaderDTO = uniqueStudents.get(groupLeaderName);
+                        StudentDTO leaderDTO = uniqueStudents.get(studentName);
                         if (leaderDTO != null) {
                             groupDTO.setGroupLeader(leaderDTO);
                         }
