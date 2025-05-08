@@ -4,9 +4,10 @@ import {Observable} from 'rxjs';
 import {Student} from './student.model';
 import {Group} from './group.model';
 import {environment} from '../environments/environment';
+import {DocumentInputData} from './documentInputData.model';
 
 @Injectable({ providedIn:'root' })
-export class GroupService {
+export class AppService {
   private apiServerUrl = environment.apiBaseUrl;
 
   constructor(private http: HttpClient) {}
@@ -32,5 +33,9 @@ export class GroupService {
    */
   public getAll(): Observable<HttpResponse<Group[]>>{
     return this.http.get<Group[]>(`${this.apiServerUrl}/group`, {observe: "response"})
+  }
+
+  public getDocument(input: DocumentInputData): Observable<Blob>{
+    return this.http.post(`${this.apiServerUrl}/word`, input, { responseType : "blob"})
   }
 }
