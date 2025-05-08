@@ -37,6 +37,14 @@ public class GroupServiceTest {
     @InjectMocks //Creates the class to be tested
     private GroupService groupService;
 
+    /**
+     * Tests saving a group with a valid code.
+     *
+     * <p>Verifies that when a {@link GroupDTO} with a valid code is saved,
+     * the corresponding {@link Group} entity is persisted.
+     *
+     * @see GroupService#save(GroupDTO)
+     */
     @Test
     void testSaveValidGroupCode() {
         GroupDTO groupDTO = new GroupDTO();
@@ -50,44 +58,72 @@ public class GroupServiceTest {
         verify(entityManager, times(1)).persist(groupEntity);
     }
 
-
+    /**
+     * Tests saving a group with an invalid code (too high).
+     *
+     * <p>Verifies that attempting to save a {@link GroupDTO} with a group code exceeding the allowed limit
+     * results in an {@link IllegalArgumentException} with the expected message.
+     *
+     * @throws IllegalArgumentException if the group code is invalid.
+     * @see GroupService#save(GroupDTO)
+     */
     @Test
     void testSaveInvalidGroupCodeTooHigh() {
         GroupDTO groupDTO = new GroupDTO();
         groupDTO.setCode("1307A");
 
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            groupService.save(groupDTO);
-        });
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> groupService.save(groupDTO));
 
         Assertions.assertEquals("Codul grupei este invalid: 1307A", exception.getMessage());
     }
 
+    /**
+     * Tests saving a group with an invalid code (invalid letter).
+     *
+     * <p>Verifies that attempting to save a {@link GroupDTO} with a group code containing an invalid letter
+     * results in an {@link IllegalArgumentException} with the expected message.
+     *
+     * @throws IllegalArgumentException if the group code contains an invalid letter.
+     * @see GroupService#save(GroupDTO)
+     */
     @Test
     void testSaveInvalidGroupCodeLetterInvalid() {
         GroupDTO groupDTO = new GroupDTO();
         groupDTO.setCode("1305C");
 
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            groupService.save(groupDTO);
-        });
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> groupService.save(groupDTO));
 
         Assertions.assertEquals("Codul grupei este invalid: 1305C", exception.getMessage());
     }
 
+    /**
+     * Tests saving a group with a null code.
+     *
+     * <p>Verifies that attempting to save a {@link GroupDTO} with a null group code
+     * results in an {@link IllegalArgumentException} with the expected message.
+     *
+     * @throws IllegalArgumentException if the group code is null.
+     * @see GroupService#save(GroupDTO)
+     */
     @Test
     void testSaveNullGroupCode() {
         GroupDTO groupDTO = new GroupDTO();
         groupDTO.setCode(null);
 
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            groupService.save(groupDTO);
-        });
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> groupService.save(groupDTO));
 
         Assertions.assertEquals("Codul grupei este invalid: null", exception.getMessage());
     }
 
 
+    /**
+     * Tests extracting the year from a valid group code.
+     *
+     * <p>Verifies that for a valid group code, the {@code extractYear} method
+     * correctly extracts and returns the year.
+     *
+     * @see GroupService#extractYear(String)
+     */
     @Test
     void testExtractYearValid() {
         String groupCode = "1304A";  //valid groupCode exemple
@@ -97,6 +133,16 @@ public class GroupServiceTest {
         Assertions.assertEquals(3, year);
     }
 
+    /**
+     * Tests finding students by a given group code.
+     *
+     * <p>Verifies that when a group code is provided, the {@code findStudentsByGroupCode} method
+     * correctly retrieves and returns a list of {@link StudentDTO} associated with that group.
+     * It mocks the {@link GroupRepository} to return a predefined list of {@link Student} entities.
+     *
+     * @see GroupService#findStudentsByGroupCode(String)
+     * @see GroupRepository#findDistinctStudentsByGroupCode(String)
+     */
     @Test
     void testFindStudentsByGroupCode() {
         String groupCode = "1305A";
@@ -119,6 +165,16 @@ public class GroupServiceTest {
         Assertions.assertEquals("Ion", result.get(1).getFirstName());
     }
 
+    /**
+     * Tests finding students by a group code when no students are associated with it.
+     *
+     * <p>Verifies that when a group code is provided and no students are found in the repository,
+     * the {@code findStudentsByGroupCode} method returns an empty list of {@link StudentDTO}.
+     * It mocks the {@link GroupRepository} to return an empty list.
+     *
+     * @see GroupService#findStudentsByGroupCode(String)
+     * @see GroupRepository#findDistinctStudentsByGroupCode(String)
+     */
     @Test
     void testFindStudentsByGroupCode_EmptyList() {
         String groupCode = "1305A";
@@ -130,12 +186,30 @@ public class GroupServiceTest {
         Assertions.assertTrue(result.isEmpty(), "Lista de studenți ar trebui să fie goală");
     }
 
+    /**
+     * Tests finding students by a null group code.
+     *
+     * <p>Verifies that calling the {@code findStudentsByGroupCode} method with a null group code
+     * results in an {@link IllegalArgumentException}.
+     *
+     * @throws IllegalArgumentException if the group code is null.
+     * @see GroupService#findStudentsByGroupCode(String)
+     */
     @Test
     void testFindStudentsByGroupCode_NullGroupCode_ThrowsException() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> groupService.findStudentsByGroupCode(null));
     }
 
-
+    /**
+     * Tests retrieving all groups.
+     *
+     * <p>Verifies that the {@code getAll} method correctly retrieves all {@link Group} entities
+     * from the repository and maps them to a list of {@link GroupDTO}. It mocks the {@link GroupRepository}
+     * to return a predefined list of {@link Group} entities.
+     *
+     * @see GroupService#getAll()
+     * @see GroupRepository#findAll()
+     */
     @Test
     void testGetAllGroups() {
         Group group1 = new Group();
@@ -161,6 +235,15 @@ public class GroupServiceTest {
         Assertions.assertEquals("1306B", result.get(1).getCode());
     }
 
+    /**
+     * Tests retrieving all groups when no groups exist in the database.
+     *
+     * <p>Verifies that the {@code getAll} method returns an empty list of {@link GroupDTO}
+     * when the {@link GroupRepository} returns an empty list.
+     *
+     * @see GroupService#getAll()
+     * @see GroupRepository#findAll()
+     */
     @Test
     void testGetAll_WhenNoGroupsExist_ReturnsEmptyList() {
         when(groupRepository.findAll()).thenReturn(Collections.emptyList());
