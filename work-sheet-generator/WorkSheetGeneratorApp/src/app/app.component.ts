@@ -1,9 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Group} from './group.model';
-import {GroupService} from './group.service';
 import {HttpErrorResponse, HttpResponse} from '@angular/common/http';
 import {FormsModule, NgForm} from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
+import {AppService} from './app.service';
+import {DocumentInputData} from './documentInputData.model';
+import saveAs from 'file-saver';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +22,7 @@ export class AppComponent implements OnInit{
   public selectedGroupCodeToAdd: string | null = null;
   public errorMessages: string[] = [];
 
-  constructor(private groupService: GroupService) {}
+  constructor(private appService: AppService) {}
 
   ngOnInit() {
     this.getGroups();
@@ -35,7 +37,7 @@ export class AppComponent implements OnInit{
    * @returns {void}
    */
   public getGroups(): void {
-    this.groupService.getAll().subscribe({
+    this.appService.getAll().subscribe({
        next: (response: HttpResponse<Group[]>) => {
          if (response && response.body){
            this.groups = response.body;
@@ -49,7 +51,7 @@ export class AppComponent implements OnInit{
 
   /**
    * Adds the selected group to the selected groups list if it exists and is not already present.
-   * Resets the selected group code afterwards.
+   * Resets the selected group code afterward.
    *
    * @public
    * @returns {void}
@@ -109,11 +111,19 @@ export class AppComponent implements OnInit{
       return;
     }
 
-    const formData = form.value;
+    let formData: DocumentInputData = new DocumentInputData(
+      form.controls['professorName']?.value,
+      form.controls['courseName']?.value,
+      form.controls['assistantName']?.value,
+      this.selectedGroups
+    );
+
     console.log('Datele formularului:', formData);
-    console.log('Grupele selectate:', this.selectedGroups);
-    // alert('Fișa ar fi generată acum.');
-    // Aici poți trimite datele către backend pentru generarea fișei
+    this.appService.getDocument(formData).subscribe( doc => {
+      const courseName: string = formData.courseName.replace(/\s+/g, '_');
+      const groupNames: string  = this.selectedGroups.map(g => g.code).join('_');
+      saveAs(doc, `worksheet_${courseName}_${groupNames}.pdf`);
+    })
   }
 
   /**
