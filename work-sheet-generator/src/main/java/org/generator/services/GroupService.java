@@ -30,11 +30,13 @@ public class GroupService {
     private final GroupRepository groupRepository;
 
     /**
-     * Constructor for the {@code GroupService} which injects the {@link GroupMapper} and {@link GroupRepository}.
+     * Constructor for the {@code GroupService} which injects the {@link EntityManager}, {@link GroupMapper} and {@link GroupRepository}.
+     * @param entityManager the {@code EntityManager} instance for database interactions.
      * @param groupMapper the mapper for converting between {@link GroupDTO} and {@link Group} entities.
      * @param groupRepository the repository for {@link Group} entities.
      */
-    public GroupService(GroupMapper groupMapper, GroupRepository groupRepository) {
+    public GroupService(EntityManager entityManager, GroupMapper groupMapper, GroupRepository groupRepository) {
+        this.entityManager = entityManager;
         this.groupMapper = groupMapper;
         this.groupRepository = groupRepository;
     }
@@ -44,9 +46,13 @@ public class GroupService {
      * This operation is transactional. It maps the provided {@link GroupDTO}
      * to its corresponding {@link Group} entity and persists it using the entity manager.
      * @param groupDTO the {@link GroupDTO} object to be saved.
+     * @throws IllegalArgumentException if the group code in the {@code groupDTO} is null or does not match the pattern "\\d{4}[A-Za-z]".
      */
     @Transactional
     public void save(GroupDTO groupDTO) {
+        if (groupDTO.getCode() == null || !groupDTO.getCode().matches("130[1-6][AB]")) {
+            throw new IllegalArgumentException("Codul grupei este invalid: " + groupDTO.getCode());
+        }
         Group groupEntity = groupMapper.toEntity(groupDTO);
         entityManager.persist(groupEntity);
     }
@@ -83,6 +89,9 @@ public class GroupService {
      * @return a {@link List} of distinct {@link StudentDTO} objects belonging to the specified group.
      */
     public List<StudentDTO> findStudentsByGroupCode(String groupCode) {
+        if (groupCode == null) {
+            throw new IllegalArgumentException("Codul grupei nu poate fi null");
+        }
         return groupRepository.findDistinctStudentsByGroupCode(groupCode)
                 .stream()
                 .map(StudentDTO::new)
