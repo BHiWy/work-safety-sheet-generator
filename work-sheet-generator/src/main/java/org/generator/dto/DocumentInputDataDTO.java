@@ -7,6 +7,10 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * Data Transfer Object (DTO) representing the input data required to generate a document.
+ * Used in the request body of the /word endpoint.
+ */
 @Setter
 @Getter
 @NoArgsConstructor

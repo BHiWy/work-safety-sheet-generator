@@ -26,7 +26,7 @@ public class StudentDTO {
     /**
      * Constructor to create a {@link StudentDTO} object from a {@link Student} entity.
      * It maps the fields from the entity to the DTO.
-     * @param {@link Student} group - The `{@link Student} entity to create the DTO from.
+     * @param student - The `{@link Student} entity to create the DTO from.
      */
     public StudentDTO(Student student) {
         this.firstName = student.getFirstName();

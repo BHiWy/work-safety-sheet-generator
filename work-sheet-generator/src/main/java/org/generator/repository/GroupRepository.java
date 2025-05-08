@@ -14,7 +14,7 @@ import java.util.List;
 public interface GroupRepository extends JpaRepository<Group, Long> {
     /**
      * Finds distinct students by a given group code.
-     * @param {String} code The code of the group.
+     * @param code The code of the group.
      * @return {List<{@link Student}>} A list of unique students in the specified group.
      */
     @Query("SELECT DISTINCT s FROM Group g JOIN g.students s WHERE g.code = :code")

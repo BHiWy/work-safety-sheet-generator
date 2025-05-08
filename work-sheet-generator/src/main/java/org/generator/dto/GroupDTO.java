@@ -28,7 +28,7 @@ public class GroupDTO {
     /**
      * Constructor to create a {@link GroupDTO} object from a {@link Group} entity.
      * It maps the fields from the entity to the DTO.
-     * @param {@link Group} group - The `{@link Group} entity to create the DTO from.
+     * @param group - The `{@link Group} entity to create the DTO from.
      */
     public GroupDTO(Group group) {
         this.code = group.getCode();

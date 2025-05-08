@@ -15,8 +15,7 @@ export class AppService {
   /**
    * Retrieves a list of students belonging to a specific group code.
    *
-   * @public
-   * @param {string} groupCode - The code of the group to find students for.
+   * @param groupCode - The code of the group to find students for.
    * @returns {Observable<HttpResponse<Student[]>>} An Observable that emits an HTTP response
    * containing an array of Student objects.
    */
@@ -27,7 +26,6 @@ export class AppService {
   /**
    * Retrieves all groups.
    *
-   * @public
    * @returns {Observable<HttpResponse<Group[]>>} An Observable that emits an HTTP response
    * containing an array of Group objects.
    */

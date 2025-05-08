@@ -7,6 +7,13 @@ import {AppService} from './app.service';
 import {DocumentInputData} from './documentInputData.model';
 import saveAs from 'file-saver';
 
+/**
+ * Root component of the WorkSheetGeneratorApp.
+ *
+ * This component manages the state and logic for generating worksheet documents.
+ * It handles form input via Angular's template-driven forms, group selection logic,
+ * form validation, error message display, and interaction with the backend service.
+ */
 @Component({
   selector: 'app-root',
   imports: [FormsModule, NgIf, NgForOf],
@@ -22,8 +29,18 @@ export class AppComponent implements OnInit{
   public selectedGroupCodeToAdd: string | null = null;
   public errorMessages: string[] = [];
 
+  /**
+   * Constructs the component and injects the required application service.
+   *
+   * @param {AppService} appService - The service responsible for backend interactions.
+   */
   constructor(private appService: AppService) {}
 
+  /**
+   * Lifecycle hook that is called after component initialization.
+   *
+   * It triggers the initial loading of available groups by calling `getGroups()`.
+   */
   ngOnInit() {
     this.getGroups();
   }
@@ -32,9 +49,6 @@ export class AppComponent implements OnInit{
    * Retrieves all groups from the group service.
    * The retrieved groups are then assigned to the `this.groups` property.
    * In case of an error during the retrieval, an alert message displaying the error is shown.
-   *
-   * @public
-   * @returns {void}
    */
   public getGroups(): void {
     this.appService.getAll().subscribe({
@@ -52,9 +66,6 @@ export class AppComponent implements OnInit{
   /**
    * Adds the selected group to the selected groups list if it exists and is not already present.
    * Resets the selected group code afterward.
-   *
-   * @public
-   * @returns {void}
    */
   public addGroup(): void {
     if (this.selectedGroupCodeToAdd) {
@@ -69,23 +80,20 @@ export class AppComponent implements OnInit{
   /**
    * Removes a group from the selected groups list at the specified index.
    *
-   * @public
    * @param {number} index - The index of the group to remove.
-   * @returns {void}
    */
   public removeGroup(index: number): void {
     this.selectedGroups.splice(index, 1);
   }
 
   /**
-   * Handles the form submission to generate a workSheetFile.
-   * It performs form validation, displays error messages if the form is invalid or no groups are selected,
-   * and logs the form data and selected groups to the console.
-   * This function sends the data to a backend service.
+   * Handles the form submission to generate a worksheet file in DOCX format.
    *
-   * @public
-   * @param {NgForm} form - The Angular form object.
-   * @returns {void}
+   * This method validates the form inputs.
+   * If validation fails, it displays corresponding error messages for a limited time.
+   * If the form is valid, it sends the data to the backend service and triggers a file download.
+   *
+   * @param {NgForm} form - The Angular form containing the document input data.
    */
   public generateWorksheetFile(form: NgForm): void {
     this.errorMessages = [];
@@ -115,22 +123,19 @@ export class AppComponent implements OnInit{
       form.controls['professorName']?.value,
       form.controls['courseName']?.value,
       form.controls['assistantName']?.value,
+      form.controls['place']?.value,
       this.selectedGroups
     );
 
-    console.log('Datele formularului:', formData);
     this.appService.getDocument(formData).subscribe( doc => {
       const courseName: string = formData.courseName.replace(/\s+/g, '_');
       const groupNames: string  = this.selectedGroups.map(g => g.code).join('_');
-      saveAs(doc, `worksheet_${courseName}_${groupNames}.pdf`);
+      saveAs(doc, `worksheet_${courseName}_${groupNames}.docx`);
     })
   }
 
   /**
    * Resets the form and clears related data such as selected groups and error messages.
-   *
-   * @public
-   * @returns {void}
    */
   public deleteInfo(): void {
       if (this.form) {
