@@ -4,9 +4,10 @@ import {Observable} from 'rxjs';
 import {Student} from './student.model';
 import {Group} from './group.model';
 import {environment} from '../environments/environment';
+import {DocumentInputData} from './documentInputData.model';
 
 @Injectable({ providedIn:'root' })
-export class GroupService {
+export class AppService {
   private apiServerUrl = environment.apiBaseUrl;
 
   constructor(private http: HttpClient) {}
@@ -14,8 +15,7 @@ export class GroupService {
   /**
    * Retrieves a list of students belonging to a specific group code.
    *
-   * @public
-   * @param {string} groupCode - The code of the group to find students for.
+   * @param groupCode - The code of the group to find students for.
    * @returns {Observable<HttpResponse<Student[]>>} An Observable that emits an HTTP response
    * containing an array of Student objects.
    */
@@ -26,11 +26,14 @@ export class GroupService {
   /**
    * Retrieves all groups.
    *
-   * @public
    * @returns {Observable<HttpResponse<Group[]>>} An Observable that emits an HTTP response
    * containing an array of Group objects.
    */
   public getAll(): Observable<HttpResponse<Group[]>>{
     return this.http.get<Group[]>(`${this.apiServerUrl}/group`, {observe: "response"})
+  }
+
+  public getDocument(input: DocumentInputData): Observable<Blob>{
+    return this.http.post(`${this.apiServerUrl}/word`, input, { responseType : "blob"})
   }
 }

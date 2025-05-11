@@ -16,7 +16,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebSocketConfig implements WebSocketConfigurer {
     /**
      * Registers WebSocket handlers to specific endpoints.
-     * @param {WebSocketHandlerRegistry} registry The registry for configuring WebSocket handlers.
+     * @param registry The registry for configuring WebSocket handlers.
      */
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {

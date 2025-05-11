@@ -16,8 +16,8 @@ public class WebSecurityConfig {
     /**
      * Configures the security filter chain for HTTP requests.
      * Defines authorization rules, disables CSRF protection, and enables CORS.
-     * @param {HttpSecurity} http The {@link HttpSecurity} object to configure.
-     * @return {SecurityFilterChain} The built security filter chain.
+     * @param  http The {@link HttpSecurity} object to configure.
+     * @return {@link SecurityFilterChain} The built security filter chain.
      * @throws Exception If an error occurs during configuration.
      */
     @Bean
