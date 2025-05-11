@@ -2,7 +2,7 @@ package org.generator.resource;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.generator.dto.DocumentInputDataDTO;
-import org.generator.services.WordService;
+//import org.generator.services.WordService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
