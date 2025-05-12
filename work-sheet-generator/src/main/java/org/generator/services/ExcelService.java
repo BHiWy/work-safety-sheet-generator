@@ -126,9 +126,9 @@ public class ExcelService {
      * Reads professors and assistant professors from an Excel file and persists them as Professor entities.
      *
      * Expected columns in the Excel file:
-     * - Column 0: Full name of the professor (main instructor)
-     * - Column 1: Course taught
-     * - Column 2: Assistant professors (optional, multiple names separated by newlines)
+     * - Column 0: Full name of the professor (main instructor);
+     * - Column 1: Course taught;
+     * - Column 2: Assistant professors (optional, multiple names separated by newlines).
      *
      * The method creates separate Professor entities for assistants,
      * assigning them the rank "Asistent", and for main professors with rank "Profesor".
