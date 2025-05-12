@@ -20,7 +20,7 @@ import saveAs from 'file-saver';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
   title = 'WorkSheetGeneratorApp';
   @ViewChild('form') form!: NgForm;
 
@@ -34,7 +34,8 @@ export class AppComponent implements OnInit{
    *
    * @param {AppService} appService - The service responsible for backend interactions.
    */
-  constructor(private appService: AppService) {}
+  constructor(private appService: AppService) {
+  }
 
   /**
    * Lifecycle hook that is called after component initialization.
@@ -52,13 +53,13 @@ export class AppComponent implements OnInit{
    */
   public getGroups(): void {
     this.appService.getAll().subscribe({
-       next: (response: HttpResponse<Group[]>) => {
-         if (response && response.body){
-           this.groups = response.body;
-         }
-       },
-        error: (err:HttpErrorResponse) => {
-         alert(err.message)
+      next: (response: HttpResponse<Group[]>) => {
+        if (response && response.body) {
+          this.groups = response.body;
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        alert(err.message)
       }
     });
   }
@@ -97,27 +98,28 @@ export class AppComponent implements OnInit{
    */
   public generateWorksheetFile(form: NgForm): void {
     this.errorMessages = [];
-    if (form.invalid) {
-      if (form.controls['professorName']?.errors?.['required']) {
-        this.errorMessages.push('Numele profesorului este obligatoriu.');
-      }
-      if (form.controls['courseName']?.errors?.['required']) {
-        this.errorMessages.push('Denumirea cursului este obligatorie.');
-      }
-      if (form.controls['assistantName']?.errors?.['required']) {
-        this.errorMessages.push('Numele profesorului assistent este obligatoriu.');
-      }
-      if (form.controls['place']?.errors?.['required']) {
-        this.errorMessages.push('Locul desfășurării este obligatoriu.');
-      }
-      if (this.selectedGroups.length === 0 ) {
-        this.errorMessages.push('Nu ați selectat nicio grupă.');
-      }
+    if (form.controls['professorName']?.errors?.['required']) {
+      this.errorMessages.push('Numele profesorului este obligatoriu.');
+    }
+    if (form.controls['courseName']?.errors?.['required']) {
+      this.errorMessages.push('Denumirea cursului este obligatorie.');
+    }
+    if (form.controls['assistantName']?.errors?.['required']) {
+      this.errorMessages.push('Numele profesorului assistent este obligatoriu.');
+    }
+    if (form.controls['place']?.errors?.['required']) {
+      this.errorMessages.push('Locul desfășurării este obligatoriu.');
+    }
+    if (this.selectedGroups.length === 0 ){
+      this.errorMessages.push('Nu ați selectat nicio grupă.');
+    }
+    if (this.errorMessages.length > 0) {
       setTimeout(() => {
         this.errorMessages = [];
       }, 8000);
       return;
     }
+
 
     let formData: DocumentInputData = new DocumentInputData(
       form.controls['professorName']?.value,
@@ -127,9 +129,9 @@ export class AppComponent implements OnInit{
       this.selectedGroups
     );
 
-    this.appService.getDocument(formData).subscribe( doc => {
+    this.appService.getDocument(formData).subscribe(doc => {
       const courseName: string = formData.courseName.replace(/\s+/g, '_');
-      const groupNames: string  = this.selectedGroups.map(g => g.code).join('_');
+      const groupNames: string = this.selectedGroups.map(g => g.code).join('_');
       saveAs(doc, `Fisa_de_protectia_muncii_${courseName}_${groupNames}.docx`);
     })
   }
@@ -138,7 +140,7 @@ export class AppComponent implements OnInit{
    * Resets the form and clears related data such as selected groups and error messages.
    */
   public deleteInfo(): void {
-      if (this.form) {
+    if (this.form) {
       this.form.resetForm();
     }
     this.selectedGroups = [];
