@@ -1,5 +1,6 @@
 package org.generator.services;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xwpf.usermodel.*;
 import org.generator.dto.DocumentInputDataDTO;
@@ -30,7 +31,7 @@ public class WordService {
      * @return ByteArrayOutputStream containing the generated Word document
      * @throws IOException if the document cannot be generated or written
      */
-    public ByteArrayOutputStream generateProtectiaMunciiSheet(DocumentInputDataDTO inputData) throws IOException {
+    public ByteArrayOutputStream generateWorkSheet(HttpServletResponse response, DocumentInputDataDTO inputData) throws IOException {
         XWPFDocument document = new XWPFDocument();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
