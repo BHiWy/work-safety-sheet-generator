@@ -27,7 +27,7 @@ public class WebSecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {}); // activează CORS folosind bean-ul CorsConfigurationSource
+                .cors(cors -> {}); // activates CORS using bean-ul CorsConfigurationSource
 
         return http.build();
     }

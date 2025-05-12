@@ -1,8 +1,11 @@
+package services;
+
 import org.apache.poi.ss.usermodel.*;
-import lombok.extern.slf4j.Slf4j;
 import org.generator.services.ExcelService;
 import org.junit.jupiter.api.Test;
-import org.springframework.stereotype.Service;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.InputStream;
 
@@ -13,14 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
  * Excel file reading capabilities, including presence of required columns,
  * empty cell checks, and group leader presence.
  */
-@Service
-@Slf4j
+@ExtendWith(MockitoExtension.class)
 public class ExcelServiceTest {
-    private final ExcelService excelService;
 
-    public ExcelServiceTest(ExcelService excelService) {
-        this.excelService = excelService;
-    }
+    @InjectMocks //Creates the class to be tested
+    private ExcelService excelService;
 
     private static final String FILE_PATH = "files/grupe-an-III-AIA-2024_2025.xls";
 
@@ -33,10 +33,9 @@ public class ExcelServiceTest {
         // Ensure that the test file exists in resources
         try (InputStream mockInputStream = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
             assertNotNull(mockInputStream, "File not found!");
-            // Call the read method
+
             excelService.readExcel();
 
-            // Ensure no errors occurred
         } catch (Exception e) {
             fail("Test failed due to error: " + e.getMessage());
         }
@@ -53,8 +52,6 @@ public class ExcelServiceTest {
             assertNull(mockInputStream, "File should not exist!");
 
             excelService.readExcel();
-
-            // Ensure no unexpected error occurred
         } catch (Exception e) {
             fail("Test failed due to error: " + e.getMessage());
         }
@@ -72,7 +69,6 @@ public class ExcelServiceTest {
 
             excelService.readExcel();
 
-            // Just verify no error occurred and that the empty file did not cause a crash
         } catch (Exception e) {
             fail("Test failed due to error: " + e.getMessage());
         }
@@ -253,6 +249,8 @@ public class ExcelServiceTest {
                 return "";
         }
     }
+
+
 }
 
 

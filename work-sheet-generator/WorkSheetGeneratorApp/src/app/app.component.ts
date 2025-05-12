@@ -130,7 +130,7 @@ export class AppComponent implements OnInit{
     this.appService.getDocument(formData).subscribe( doc => {
       const courseName: string = formData.courseName.replace(/\s+/g, '_');
       const groupNames: string  = this.selectedGroups.map(g => g.code).join('_');
-      saveAs(doc, `worksheet_${courseName}_${groupNames}.docx`);
+      saveAs(doc, `Fisa_de_protectia_muncii_${courseName}_${groupNames}.docx`);
     })
   }
 
