@@ -8,6 +8,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.generator.dto.GroupDTO;
 import org.generator.dto.StudentDTO;
 import org.generator.entities.Student;
+import org.generator.entities.Professor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class ExcelService {
     private static final String FILE_PATH = "files/grupe-an-III-AIA-2024_2025.xls";
     private final StudentService studentService;
     private final GroupService groupService;
+    private final ProfessorService professorService;
 
     /**
      * Constructor for {@code ExcelService} which injects the {@link GroupService} and {@link StudentService}.
@@ -35,9 +37,10 @@ public class ExcelService {
      * @param studentService the service responsible for handling student-related operations.
      * @param groupService the service responsible for handling group-related operations.
      */
-    public ExcelService(StudentService studentService, GroupService groupService) {
+    public ExcelService(StudentService studentService, GroupService groupService, ProfessorService professorService) {
         this.studentService = studentService;
         this.groupService = groupService;
+        this.professorService = professorService;
     }
 
     /**
@@ -117,5 +120,74 @@ public class ExcelService {
             System.err.println("Error reading Excel file: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Reads professors and assistant professors from an Excel file and persists them as Professor entities.
+     *
+     * Expected columns in the Excel file:
+     * - Column 0: Full name of the professor (main instructor);
+     * - Column 1: Course taught;
+     * - Column 2: Assistant professors (optional, multiple names separated by newlines).
+     *
+     * The method creates separate Professor entities for assistants,
+     * assigning them the rank "Asistent", and for main professors with rank "Profesor".
+     */
+    @Transactional
+    public void readProfessorsFromExcel() {
+        String filePath = "files/profesori.xls"; // Update if the filename is different
+
+        try (InputStream fis = getClass().getClassLoader().getResourceAsStream(filePath)) {
+            Workbook workbook = filePath.endsWith(".xls") ? new HSSFWorkbook(fis) : new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheetAt(0);
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) continue;
+
+                String fullName = getCellStringValue(row.getCell(0));
+                String course = getCellStringValue(row.getCell(1));
+                String assistantsRaw = getCellStringValue(row.getCell(2));
+
+                // Skip row if essential data is missing
+                if (fullName.isEmpty() || course.isEmpty()) continue;
+
+                // Main professor
+                Professor professor = new Professor();
+                professor.setFullName(fullName);
+                professor.setCourses(List.of(course));
+                professor.setRank("Profesor");
+
+                professorService.save(professor);
+
+                // Assistant professors
+                List<Professor> assistants = Arrays.stream(assistantsRaw.split("\n"))
+                        .map(String::trim)
+                        .filter(name -> !name.isEmpty())
+                        .map(name -> {
+                            Professor assistant = new Professor();
+                            assistant.setFullName(name);
+                            assistant.setCourses(List.of(course)); // Assistants associated with same course
+                            assistant.setRank("Asistent");
+                            return assistant;
+                        })
+                        .toList();
+
+                assistants.forEach(professorService::save);
+            }
+
+        } catch (IOException e) {
+            log.error("Failed to read professors from Excel: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Utility method to safely extract string value from a cell.
+     *
+     * @param cell the Excel cell
+     * @return the trimmed string value, or an empty string if null
+     */
+    private String getCellStringValue(Cell cell) {
+        return (cell == null) ? "" : cell.toString().trim();
     }
 }
