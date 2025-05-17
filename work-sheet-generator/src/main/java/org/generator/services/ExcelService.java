@@ -18,7 +18,7 @@ import java.util.stream.IntStream;
 
 /**
  * Service class responsible for reading and processing data from Excel files.
- * The {@link #readExcel()} method handles the extraction of student and group information,
+ * The {@link #readStudentsFromExcel()} method handles the extraction of student and group information,
  * ensuring uniqueness and associating group leaders. The processed data is then saved
  * using the {@link GroupService}.
  */
@@ -26,7 +26,9 @@ import java.util.stream.IntStream;
 @Service
 @Slf4j
 public class ExcelService {
-    private static final String FILE_PATH = "files/grupe-an-III-AIA-2024_2025.xls";
+    private static final String studentsExcelPath = "files/grupe-an-III-AIA-2024_2025.xls";
+    private static final String professorsExcelPath = "files/profesori.xls";
+
     private final StudentService studentService;
     private final GroupService groupService;
     private final ProfessorService professorService;
@@ -44,22 +46,22 @@ public class ExcelService {
     }
 
     /**
-     * Reads student and group data from an Excel file specified by {@link #FILE_PATH}.
-     * Extracts student names and group codes, creating unique {@link StudentDTO} and {@link #FILE_PATH} objects.
+     * Reads student and group data from an Excel file specified by {@link #studentsExcelPath}.
+     * Extracts student names and group codes, creating unique {@link StudentDTO} and {@link #studentsExcelPath} objects.
      * Associates students with their groups and identifies group leaders.
      * Saves all unique groups (and associated students) using {@link GroupService#save(GroupDTO)}.
      * This method takes no parameters and returns no value.
      */
     @Transactional
-    public void readExcel() {
-        try (InputStream fis = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
+    public void readStudentsFromExcel() {
+        try (InputStream fis = getClass().getClassLoader().getResourceAsStream(studentsExcelPath)) {
             Workbook workbook;
-            if (FILE_PATH.endsWith(".xls")) {
+            if (studentsExcelPath.endsWith(".xls")) {
                 workbook = new HSSFWorkbook(fis);
-            } else if (FILE_PATH.endsWith(".xlsx")) {
+            } else if (studentsExcelPath.endsWith(".xlsx")) {
                 workbook = new XSSFWorkbook(fis);
             } else {
-                System.err.println("Unsupported file format: " + FILE_PATH);
+                System.err.println("Unsupported file format: " + studentsExcelPath);
                 return;
             }
 
@@ -90,18 +92,15 @@ public class ExcelService {
                         return dto;
                     });
 
-                    // Extract the name details and set them in the StudentDTO object
                     Student extractedStudentDetails = this.studentService.extractNameDetails(studentName);
                     studentDTO.setLastName(extractedStudentDetails.getLastName());
                     studentDTO.setFirstName(extractedStudentDetails.getFirstName());
                     studentDTO.setPaternalInitial(extractedStudentDetails.getPaternalInitial());
 
-                    // Associate the student with the group
                     if (!groupDTO.getStudents().contains(studentDTO)) {
                         groupDTO.getStudents().add(studentDTO);
                     }
 
-                    // Check if the student is the group leader
                     if (!groupLeaderName.isEmpty() && groupDTO.getGroupLeader() == null) {
                         StudentDTO leaderDTO = uniqueStudents.get(studentName);
                         if (leaderDTO != null) {
@@ -111,7 +110,6 @@ public class ExcelService {
                 }
             });
 
-            // Save groups (and students by default)
             for (GroupDTO groupDTO : uniqueGroups.values()) {
                 groupService.save(groupDTO);
             }
@@ -123,58 +121,49 @@ public class ExcelService {
     }
 
     /**
-     * Reads professors and assistant professors from an Excel file and persists them as Professor entities.
-     *
-     * Expected columns in the Excel file:
-     * - Column 0: Full name of the professor (main instructor);
-     * - Column 1: Course taught;
-     * - Column 2: Assistant professors (optional, multiple names separated by newlines).
-     *
-     * The method creates separate Professor entities for assistants,
-     * assigning them the rank "Asistent", and for main professors with rank "Profesor".
+     * Reads professor and assistant data from an Excel file specified by {@link #professorsExcelPath}.
+     * Extracts professor full names, associated courses, and assistant names from each row.
+     * Creates {@link Professor} entities for both professors and their assistants, assigning the correct rank ("Profesor" or "Asistent").
+     * Saves all created {@link Professor} entities using {@link ProfessorService#save(Professor)}.
+     * It handles potential {@link IOException} during file reading and logs any errors encountered.
      */
     @Transactional
     public void readProfessorsFromExcel() {
-        String filePath = "files/profesori.xls"; // Update if the filename is different
 
-        try (InputStream fis = getClass().getClassLoader().getResourceAsStream(filePath)) {
-            Workbook workbook = filePath.endsWith(".xls") ? new HSSFWorkbook(fis) : new XSSFWorkbook(fis);
+        try (InputStream fis = getClass().getClassLoader().getResourceAsStream(professorsExcelPath)) {
+            Workbook workbook = professorsExcelPath.endsWith(".xls") ? new HSSFWorkbook(fis) : new XSSFWorkbook(fis);
             Sheet sheet = workbook.getSheetAt(0);
 
-            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                Row row = sheet.getRow(i);
-                if (row == null) continue;
+            IntStream.rangeClosed(1, sheet.getLastRowNum())
+                    .mapToObj(sheet::getRow)
+                    .filter(Objects::nonNull)
+                    .forEach(row -> {
+                        String fullName = getCellStringValue(row.getCell(2));
+                        String course = getCellStringValue(row.getCell(3));
+                        String assistantsRaw = getCellStringValue(row.getCell(4));
 
-                String fullName = getCellStringValue(row.getCell(0));
-                String course = getCellStringValue(row.getCell(1));
-                String assistantsRaw = getCellStringValue(row.getCell(2));
+                        if (fullName.isEmpty() && course.isEmpty()) {
+                            return;
+                        }
 
-                // Skip row if essential data is missing
-                if (fullName.isEmpty() || course.isEmpty()) continue;
+                        Professor professor = new Professor();
+                        professor.setFullName(fullName);
+                        professor.setCourses(List.of(course));
+                        professor.setRank("Profesor");
+                        professorService.save(professor);
 
-                // Main professor
-                Professor professor = new Professor();
-                professor.setFullName(fullName);
-                professor.setCourses(List.of(course));
-                professor.setRank("Profesor");
-
-                professorService.save(professor);
-
-                // Assistant professors
-                List<Professor> assistants = Arrays.stream(assistantsRaw.split("\n"))
-                        .map(String::trim)
-                        .filter(name -> !name.isEmpty())
-                        .map(name -> {
-                            Professor assistant = new Professor();
-                            assistant.setFullName(name);
-                            assistant.setCourses(List.of(course)); // Assistants associated with same course
-                            assistant.setRank("Asistent");
-                            return assistant;
-                        })
-                        .toList();
-
-                assistants.forEach(professorService::save);
-            }
+                        Arrays.stream(assistantsRaw.split("\n"))
+                                .map(String::trim)
+                                .filter(name -> !name.isEmpty())
+                                .map(name -> {
+                                    Professor assistant = new Professor();
+                                    assistant.setFullName(name);
+                                    assistant.setCourses(List.of(course));
+                                    assistant.setRank("Asistent");
+                                    return assistant;
+                                })
+                                .forEach(professorService::save);
+                    });
 
         } catch (IOException e) {
             log.error("Failed to read professors from Excel: {}", e.getMessage());
@@ -182,10 +171,11 @@ public class ExcelService {
     }
 
     /**
-     * Utility method to safely extract string value from a cell.
+     * Retrieves the string value of a given Excel cell.
+     * It converts the cell's content to a string and removes leading and trailing whitespace.
      *
-     * @param cell the Excel cell
-     * @return the trimmed string value, or an empty string if null
+     * @param cell The Excel {@link Cell} to retrieve the value from.
+     * @return The trimmed string value of the cell, or an empty string if the cell is null.
      */
     private String getCellStringValue(Cell cell) {
         return (cell == null) ? "" : cell.toString().trim();

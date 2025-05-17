@@ -34,11 +34,12 @@ public class Generator implements CommandLineRunner {
 
     /**
      * Callback method that is executed after the Spring application context is loaded.
-     * Here, it calls the {@link ExcelService#readExcel()} method of the {@link ExcelService}.
+     * Here, it calls the {@link ExcelService#readStudentsFromExcel()} method of the {@link ExcelService}.
      * @param  args - Command line arguments passed to the application.
      */
     @Override
     public void run(String... args) {
-        excelService.readExcel();
+        excelService.readStudentsFromExcel();
+        excelService.readProfessorsFromExcel();
     }
 }
