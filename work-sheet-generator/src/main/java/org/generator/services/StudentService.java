@@ -62,7 +62,6 @@ public class StudentService {
             return student;
         }
 
-        // First part is the last name
         student.setLastName(parts[0].replaceAll("[.,]", ""));
 
         StringBuilder firstNameBuilder = new StringBuilder();
@@ -72,12 +71,12 @@ public class StudentService {
         for (int i = 1; i < parts.length; i++) {
             String part = parts[i].trim();
             if (part.matches("[A-Z]\\.")) {                 // Matches a single initial
-                if (parentalInitialBuilder.length() > 0) {
+                if (!parentalInitialBuilder.isEmpty()) {
                     parentalInitialBuilder.append(" ");
                 }
                 parentalInitialBuilder.append(part.toUpperCase());
             } else if (part.matches("[A-Z]\\.[A-Z]\\.")) {  // Matches two initials
-                if (parentalInitialBuilder.length() > 0) {
+                if (!parentalInitialBuilder.isEmpty()) {
                     parentalInitialBuilder.append(" ");
                 }
                 parentalInitialBuilder.append(part.toUpperCase());
@@ -124,10 +123,10 @@ public class StudentService {
         for (int i = 1; i < parts.length; i++) {
             String currentPart = parts[i].trim();
             if (currentPart.length() == 2 && currentPart.matches("[a-z]\\.")) {
-                continue; // Skip single parental initials (e.g., f.)
+                continue; // Skip single parental initials
             }
             if (currentPart.length() > 2 && currentPart.matches("([a-z]\\.)+")) {
-                continue; // Skip multiple parental initials (e.g., n.a.)
+                continue; // Skip multiple parental initials (
             }
 
             String cleanedPart = currentPart.replaceAll("[.,]", "");

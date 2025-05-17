@@ -23,8 +23,10 @@ h2 {
   margin-bottom: 20px;
 }
 
-.form-group {
-  margin-bottom: 15px;
+.form-group select,
+.form-group input {
+  width: 370px;
+  max-width: 100%;
 }
 
 label {
@@ -152,5 +154,11 @@ body, html {
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+select.custom-select:invalid {
+  color: gray;
+}
+select.custom-select {
+  color: #000;
 }

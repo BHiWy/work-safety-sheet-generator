@@ -6,6 +6,7 @@ import {NgForOf, NgIf} from '@angular/common';
 import {AppService} from './app.service';
 import {DocumentInputData} from './documentInputData.model';
 import saveAs from 'file-saver';
+import {Professor, ProfessorRank} from './professor.model';
 
 /**
  * Root component of the WorkSheetGeneratorApp.
@@ -25,6 +26,10 @@ export class AppComponent implements OnInit {
   @ViewChild('form') form!: NgForm;
 
   public groups: Group[] = [];
+  public professors: Professor[] = [];
+  public assistants: Professor[] = [];
+  public allAssistants: Professor[] = [];
+  public courses: string[] = [];
   public selectedGroups: Group[] = [];
   public selectedGroupCodeToAdd: string | null = null;
   public errorMessages: string[] = [];
@@ -44,15 +49,15 @@ export class AppComponent implements OnInit {
    */
   ngOnInit() {
     this.getGroups();
+    this.getProfessors();
   }
 
   /**
    * Retrieves all groups from the group service.
-   * The retrieved groups are then assigned to the `this.groups` property.
    * In case of an error during the retrieval, an alert message displaying the error is shown.
    */
   public getGroups(): void {
-    this.appService.getAll().subscribe({
+    this.appService.getAllGroups().subscribe({
       next: (response: HttpResponse<Group[]>) => {
         if (response && response.body) {
           this.groups = response.body;
@@ -62,6 +67,51 @@ export class AppComponent implements OnInit {
         alert(err.message)
       }
     });
+  }
+
+  /**
+   * Retrieves all professors and assistants from the professor service.
+   * In case of an error during the retrieval, an alert message displaying the error is shown.
+   */
+  public getProfessors(): void {
+    this.appService.getProfessorsByRank(ProfessorRank.Professor).subscribe({
+      next: (response: HttpResponse<Professor[]>) => {
+        if (response && response.body) {
+          this.professors = response.body;
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        alert(err.message)
+      }
+    });
+    this.appService.getProfessorsByRank(ProfessorRank.Assistant).subscribe({
+      next: (response: HttpResponse<Professor[]>) => {
+        if (response && response.body) {
+          this.allAssistants = response.body;
+          this.assistants = response.body;
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        alert(err.message)
+      }
+    });
+  }
+
+  /**
+   * Handles the event when the selected professor in the form changes.
+   * It retrieves the courses taught by the selected professor and updates the list of available assistants.
+   */
+  onProfessorChange() {
+    const prof = this.professors.find(p => p.fullName === this.form.controls['professorName']?.value);
+    if(prof && prof.id){
+      this.appService.getCoursesByProfessorId(prof.id).subscribe( res=> {
+        if (res && res.body) {
+          this.courses = res.body;
+          this.assistants = this.allAssistants.filter(a =>  a.courses?.some(course => this.courses.includes(course)));
+          this.assistants.push(prof);
+        }
+      })
+    }
   }
 
   /**
@@ -119,7 +169,6 @@ export class AppComponent implements OnInit {
       }, 8000);
       return;
     }
-
 
     let formData: DocumentInputData = new DocumentInputData(
       form.controls['professorName']?.value,

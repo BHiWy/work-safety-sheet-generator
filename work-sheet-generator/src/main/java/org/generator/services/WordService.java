@@ -27,15 +27,14 @@ public class WordService {
      * with personal and job-related information from the provided DTO.
      * In case some fields are null, default values or placeholders are used for testing.
      *
-     * @param inputData a DTO object containing the required data fields
-     * @return ByteArrayOutputStream containing the generated Word document
+     * @param inputData a {@link DocumentInputDataDTO} object containing the required data fields
+     * @return {@link ByteArrayOutputStream} containing the generated Word document
      * @throws IOException if the document cannot be generated or written
      */
     public ByteArrayOutputStream generateWorkSheet(HttpServletResponse response, DocumentInputDataDTO inputData) throws IOException {
         XWPFDocument document = new XWPFDocument();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        // Create and format the document title
         XWPFParagraph title = document.createParagraph();
         title.setAlignment(ParagraphAlignment.CENTER);
         XWPFRun runTitle = title.createRun();
@@ -43,15 +42,13 @@ public class WordService {
         runTitle.setBold(true);
         runTitle.setFontSize(16);
 
-        document.createParagraph(); // Empty line for spacing
+        document.createParagraph();
 
-        // Insert each field as a labeled paragraph
         addField(document, "Professor", inputData.getProfessorName() != null ? inputData.getProfessorName() : "TestProfessor");
         addField(document, "Course", inputData.getCourseName() != null ? inputData.getCourseName() : "TestCourse");
         addField(document, "Assistant", inputData.getAssistantName() != null ? inputData.getAssistantName() : "TestAssistant");
         addField(document, "Place", inputData.getPlace() != null ? inputData.getPlace() : "TestPlace");
 
-        // Write document to output stream and close
         document.write(out);
         document.close();
 
