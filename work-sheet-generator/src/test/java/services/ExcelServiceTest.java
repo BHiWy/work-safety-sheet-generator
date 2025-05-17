@@ -34,7 +34,7 @@ public class ExcelServiceTest {
         try (InputStream mockInputStream = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
             assertNotNull(mockInputStream, "File not found!");
 
-            excelService.readExcel();
+            excelService.readStudentsFromExcel();
 
         } catch (Exception e) {
             fail("Test failed due to error: " + e.getMessage());
@@ -51,7 +51,7 @@ public class ExcelServiceTest {
         try (InputStream mockInputStream = getClass().getClassLoader().getResourceAsStream("excel/fisier_inexistent_123.xlsx")) {
             assertNull(mockInputStream, "File should not exist!");
 
-            excelService.readExcel();
+            excelService.readStudentsFromExcel();
         } catch (Exception e) {
             fail("Test failed due to error: " + e.getMessage());
         }
@@ -67,7 +67,7 @@ public class ExcelServiceTest {
         try (InputStream mockInputStream = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
             assertNotNull(mockInputStream, "Empty file not found!");
 
-            excelService.readExcel();
+            excelService.readStudentsFromExcel();
 
         } catch (Exception e) {
             fail("Test failed due to error: " + e.getMessage());

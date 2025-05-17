@@ -34,7 +34,7 @@ public class GroupResource {
 
     /**
      * Retrieves all groups.
-     * @return {ResponseEntity<List<{@link GroupDTO}>>} A `ResponseEntity` containing a list of {@link GroupDTO}s and an HTTP OK status.
+     * @return A {@link ResponseEntity} containing a list of {@link GroupDTO}s and an HTTP OK status.
      */
     @GetMapping("")
     public ResponseEntity<List<GroupDTO>> getAll() {
@@ -45,7 +45,7 @@ public class GroupResource {
     /**
      * Retrieves all students belonging to a specific group code.
      * @param groupCode The code of the group to find students for.
-     * @return {ResponseEntity<List<{@link StudentDTO}>>} A `ResponseEntity` containing a list of {@link StudentDTO}s and an HTTP OK status.
+     * @return A {@link ResponseEntity} containing a list of {@link GroupDTO}s and an HTTP OK status.
      */
     @GetMapping("/find-students/{groupCode}")
     public ResponseEntity<List<StudentDTO>> getAllStudentsByGroupCode(@PathVariable("groupCode") String groupCode) {

@@ -9,6 +9,7 @@ import org.generator.mapper.GroupMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+import org.generator.mapper.StudentMapper;
 import org.generator.repository.GroupRepository;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ public class GroupService {
     private EntityManager entityManager;
 
     private final GroupMapper groupMapper;
+    private final StudentMapper studentMapper;
     private final GroupRepository groupRepository;
 
     /**
@@ -34,11 +36,13 @@ public class GroupService {
      * @param entityManager the {@code EntityManager} instance for database interactions.
      * @param groupMapper the mapper for converting between {@link GroupDTO} and {@link Group} entities.
      * @param groupRepository the repository for {@link Group} entities.
+     * @param studentMapper the mapper for converting between {@link StudentDTO} and {@link Student} entities.
      */
-    public GroupService(EntityManager entityManager, GroupMapper groupMapper, GroupRepository groupRepository) {
+    public GroupService(EntityManager entityManager, GroupMapper groupMapper, GroupRepository groupRepository, StudentMapper studentMapper) {
         this.entityManager = entityManager;
         this.groupMapper = groupMapper;
         this.groupRepository = groupRepository;
+        this.studentMapper = studentMapper;
     }
 
     /**
@@ -86,7 +90,7 @@ public class GroupService {
      * to its corresponding {@link StudentDTO}.
      *
      * @param groupCode the unique code of the group.
-     * @return a {@link List} of distinct {@link StudentDTO} objects belonging to the specified group.
+     * @return A {@link List} of distinct {@link StudentDTO} objects belonging to the specified group.
      */
     public List<StudentDTO> findStudentsByGroupCode(String groupCode) {
         if (groupCode == null) {
@@ -94,17 +98,17 @@ public class GroupService {
         }
         return groupRepository.findDistinctStudentsByGroupCode(groupCode)
                 .stream()
-                .map(StudentDTO::new)
+                .map(studentMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     /**
      * Retrieves all groups and returns them as a list of {@link GroupDTO}s.
-     * @return {List<{@link GroupDTO}>} A list containing all groups mapped to their DTO representation.
+     * @return A {@link List} of {@link GroupDTO} containing all groups mapped to their DTO representation.
      */
     public List<GroupDTO> getAll(){
         return groupRepository.findAll().stream()
-                .map(GroupDTO::new)
+                .map(groupMapper::toDTO)
                 .collect(Collectors.toList());
     }
 }

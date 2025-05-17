@@ -5,20 +5,29 @@
   <form #form="ngForm" (ngSubmit)="generateWorksheetFile(form)">
     <div class="grid-container">
       <div class="form-group">
-        <label for="professorName" class="required">Numele profesorului:</label>
-        <input type="text" id="professorName" name="professorName" ngModel required>
+        <label for="professorName" class="required">Numele profesorului titular:</label>
+        <select id="professorName" class="custom-select" name="professorName" ngModel required (change)="onProfessorChange()">
+          <option value="" disabled selected>Selectează profesor titluar</option>
+          <option *ngFor="let prof of professors" [value]="prof.fullName"> {{ prof.fullName }}</option>
+        </select>
       </div>
       <div class="form-group">
         <label for="courseName" class="required">Denumire curs:</label>
-        <input type="text" id="courseName" name="courseName" ngModel required>
+        <select id="courseName" class="custom-select" name="courseName" ngModel required>
+          <option  value="" disabled selected>Selectează cursul</option>
+          <option *ngFor="let course of courses" [value]="course"> {{ course }}</option>
+        </select>
       </div>
       <div class="form-group">
         <label for="assistantName" class="required">Numele profesorului asistent:</label>
-        <input type="text" id="assistantName" name="assistantName" ngModel required>
+        <select id="assistantName" class="custom-select" name="professorName" ngModel required>
+          <option value="" disabled selected>Selectează profesor asistent</option>
+          <option *ngFor="let prof of assistants" [value]="prof.fullName"> {{ prof.fullName }}</option>
+        </select>
       </div>
       <div class="form-group">
         <label for="place" class="required">Loc desfășurare:</label>
-        <input type="text" id="place" name="place" ngModel required>
+        <input type="text" id="place" name="place" ngModel required [placeholder]="'Selecteaza locația'">
       </div>
     </div>
 
