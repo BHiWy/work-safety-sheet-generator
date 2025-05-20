@@ -1,6 +1,7 @@
 package org.generator.resource;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.generator.dto.GroupDTO;
 import org.generator.dto.StudentDTO;
 import org.generator.services.GroupService;
@@ -17,6 +18,7 @@ import java.util.List;
  * REST controller for managing {@link org.generator.entities.Group} resources.
  * Provides endpoints for retrieving group and student data.
  */
+@Slf4j
 @RestController
 @RequestMapping("/group")
 public class GroupResource {
@@ -38,6 +40,7 @@ public class GroupResource {
      */
     @GetMapping("")
     public ResponseEntity<List<GroupDTO>> getAll() {
+        log.debug("REST request to get all Groups");
         List<GroupDTO> students = this.groupService.getAll();
         return new ResponseEntity<>(students, HttpStatus.OK);
     }
@@ -49,6 +52,7 @@ public class GroupResource {
      */
     @GetMapping("/find-students/{groupCode}")
     public ResponseEntity<List<StudentDTO>> getAllStudentsByGroupCode(@PathVariable("groupCode") String groupCode) {
+        log.debug("REST request to get all Students by group code: {}", groupCode);
         List<StudentDTO> students = this.groupService.findStudentsByGroupCode(groupCode);
         return new ResponseEntity<>(students, HttpStatus.OK);
     }

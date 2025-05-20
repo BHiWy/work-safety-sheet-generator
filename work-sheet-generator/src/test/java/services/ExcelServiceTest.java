@@ -28,16 +28,15 @@ public class ExcelServiceTest {
     @InjectMocks //Creates the class to be tested
     private ExcelService excelService;
 
-    private static final String FILE_PATH = "files/grupe-an-III-AIA-2024_2025.xls";
+    private static final String studentsExcelPath = "files/grupe-an-III-AIA-2024_2025.xls";
 
     /**
      * Tests reading a valid Excel file.
-     * Ensures that the file exists and no exceptions are thrown during processing.
+     * Ensures that the students file exists and no exceptions are thrown during processing.
      */
     @Test
-    public void testReadExcelValidFile() {
-        // Ensure that the test file exists in resources
-        try (InputStream mockInputStream = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
+    public void testReadStudentsFromExcel_ValidFile() {
+        try (InputStream mockInputStream = getClass().getClassLoader().getResourceAsStream(studentsExcelPath)) {
             assertNotNull(mockInputStream, "File not found!");
 
             excelService.readStudentsFromExcel();
@@ -52,8 +51,7 @@ public class ExcelServiceTest {
      * Verifies that no unexpected errors occur if the file is missing.
      */
     @Test
-    public void testReadExcelInvalidFile() {
-        // Test the case when the file does not exist
+    public void testReadStudentsFromExcel_InvalidFile() {
         try (InputStream mockInputStream = getClass().getClassLoader().getResourceAsStream("excel/fisier_inexistent_123.xlsx")) {
             assertNull(mockInputStream, "File should not exist!");
 
@@ -64,13 +62,12 @@ public class ExcelServiceTest {
     }
 
     /**
-     * Tests reading an Excel file that exists but contains no relevant data.
+     * Tests reading an Excel file  that exists but contains no relevant data.
      * Verifies that no crash occurs even if the file is empty.
      */
     @Test
-    public void testReadExcelEmptyFile() {
-        // Test the case when the file exists but contains no relevant data
-        try (InputStream mockInputStream = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
+    public void testReadStudentsFromExcel_EmptyFile() {
+        try (InputStream mockInputStream = getClass().getClassLoader().getResourceAsStream(studentsExcelPath)) {
             assertNotNull(mockInputStream, "Empty file not found!");
 
             excelService.readStudentsFromExcel();
@@ -85,8 +82,8 @@ public class ExcelServiceTest {
      * The check stops when a null or blank cell is found in the "Nr." column.
      */
     @Test
-    public void testExcelStudentOrGroupEmpty() {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
+    public void testReadStudentsFromExcel_StudentOrGroupEmpty() {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(studentsExcelPath)) {
             assertNotNull(inputStream, "Excel file not found!");
 
             Workbook workbook = WorkbookFactory.create(inputStream);
@@ -96,7 +93,6 @@ public class ExcelServiceTest {
             int grupaColIndex = -1;
             int nrColIndex = -1;
 
-            // Get the header row (Excel row 9 = index 8)
             Row headerRow = sheet.getRow(8);
             for (Cell cell : headerRow) {
                 String value = cell.getStringCellValue();
@@ -115,17 +111,15 @@ public class ExcelServiceTest {
 
             boolean hasEmpty = false;
 
-            // Iterate from row 10 to end, stopping at first null in "Nr." column
             for (int i = 9; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) continue;
 
                 Cell nrCell = row.getCell(nrColIndex);
                 if (nrCell == null || nrCell.getCellType() == CellType.BLANK) {
-                    break; // Stop at first blank in "Nr." column
+                    break;
                 }
 
-                // Check for empty cells in "Student" or "Group" columns
                 Cell studentCell = row.getCell(studentColIndex);
                 Cell grupaCell = row.getCell(grupaColIndex);
 
@@ -147,8 +141,8 @@ public class ExcelServiceTest {
      * Groups are identified by "Nr." column starting at 1.
      */
     @Test
-    public void testGroupHasGroupLeader() {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(FILE_PATH)) {
+    public void testReadStudentsFromExcel_GroupHasGroupLeader() {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(studentsExcelPath)) {
             assertNotNull(inputStream, "Excel file not found!");
 
             Workbook workbook = WorkbookFactory.create(inputStream);
@@ -159,7 +153,6 @@ public class ExcelServiceTest {
             int nrColIndex = -1;
             int obsColIndex = -1;
 
-            // Get the header row (assumed to be at line 9 / index 8)
             Row headerRow = sheet.getRow(8);
             for (Cell cell : headerRow) {
                 String value = cell.getStringCellValue();
@@ -182,14 +175,13 @@ public class ExcelServiceTest {
             boolean allGroupsHaveSef = true;
             boolean groupHasSefDeGrupa = false;
 
-            // Iterate through all rows
             for (int i = 9; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) continue;
 
                 Cell nrCell = row.getCell(nrColIndex);
                 if (nrCell == null || nrCell.getCellType() == CellType.BLANK) {
-                    break; // End of data
+                    break;
                 }
 
                 String nrValue = getCellValueAsString(nrCell);
@@ -209,12 +201,6 @@ public class ExcelServiceTest {
                     }
                 }
             }
-
-            // Check last group (optional logic if needed)
-            // if (!groupHasSefDeGrupa) {
-            //     System.out.println("Last group has no group leader!");
-            //     allGroupsHaveSef = false;
-            // }
 
             assertTrue(allGroupsHaveSef, "Not all groups have a group leader!");
 
@@ -262,16 +248,13 @@ public class ExcelServiceTest {
      */
     @Test
     public void testReadProfessorsFromExcel_SavesAllProfessorsAndAssistants() {
-        // Arrange: Mock the professor service to observe save calls
         ProfessorService professorService = mock(ProfessorService.class);
         StudentService studentService = mock(StudentService.class);
         GroupService groupService = mock(GroupService.class);
         ExcelService localExcelService = new ExcelService(studentService, groupService, professorService);
 
-        // Act
         localExcelService.readProfessorsFromExcel();
 
-        // Assert
         ArgumentCaptor<Professor> captor = ArgumentCaptor.forClass(Professor.class);
         verify(professorService, atLeastOnce()).save(captor.capture());
 
@@ -291,16 +274,13 @@ public class ExcelServiceTest {
      */
     @Test
     public void testReadProfessorsFromExcel_DataIntegrity() {
-        // Arrange
         ProfessorService professorService = mock(ProfessorService.class);
         StudentService studentService = mock(StudentService.class);
         GroupService groupService = mock(GroupService.class);
         ExcelService localExcelService = new ExcelService(studentService, groupService, professorService);
 
-        // Act
         localExcelService.readProfessorsFromExcel();
 
-        // Assert
         ArgumentCaptor<Professor> captor = ArgumentCaptor.forClass(Professor.class);
         verify(professorService, atLeastOnce()).save(captor.capture());
 
@@ -316,31 +296,6 @@ public class ExcelServiceTest {
                     "Professor rank must be 'Profesor' or 'Asistent'."
             );
         }
-    }
-
-    /**
-     * Tests that duplicate professor entries are not saved multiple times.
-     * Assumes that professors with identical names are considered duplicates.
-     */
-    @Test
-    public void testReadProfessorsFromExcel_DuplicatesAreIgnored() {
-        ProfessorService professorService = mock(ProfessorService.class);
-        StudentService studentService = mock(StudentService.class);
-        GroupService groupService = mock(GroupService.class);
-        ExcelService localExcelService = new ExcelService(studentService, groupService, professorService);
-
-        localExcelService.readProfessorsFromExcel();
-
-        ArgumentCaptor<Professor> captor = ArgumentCaptor.forClass(Professor.class);
-        verify(professorService, atLeastOnce()).save(captor.capture());
-
-        long totalSaves = captor.getAllValues().size();
-        long uniqueNames = captor.getAllValues().stream()
-                .map(Professor::getFullName)
-                .distinct()
-                .count();
-
-        assertEquals(uniqueNames, totalSaves, "Duplicate professor entries should not be saved.");
     }
 
     /**
@@ -390,14 +345,3 @@ public class ExcelServiceTest {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-

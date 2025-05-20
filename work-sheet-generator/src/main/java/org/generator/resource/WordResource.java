@@ -1,6 +1,7 @@
 package org.generator.resource;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.generator.dto.DocumentInputDataDTO;
 import org.generator.services.WordService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import java.io.IOException;
  * Provides an endpoint to receive document input data and return a generated
  * .docx file as a response.
  */
+@Slf4j
 @RestController
 @RequestMapping("/word")
 public class WordResource {
@@ -39,6 +41,7 @@ public class WordResource {
      */
     @PostMapping("")
     public void getWord(HttpServletResponse response, @RequestBody DocumentInputDataDTO inputData) throws IOException {
+        log.debug("REST request to generate Word file with input data: {}", inputData);
         ByteArrayOutputStream stream = wordService.generateWorkSheet(response, inputData);
         try{
             if (stream != null) {

@@ -1,5 +1,6 @@
 package org.generator.resource;
 
+import lombok.extern.slf4j.Slf4j;
 import org.generator.dto.ProfessorDTO;
 import org.generator.services.ProfessorService;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/professor")
 public class ProfessorResource {
@@ -32,6 +34,7 @@ public class ProfessorResource {
      */
     @GetMapping("/{rank}")
     public ResponseEntity<List<ProfessorDTO>> getAllByRank(@PathVariable String rank) {
+        log.debug("REST request to get all professors by rank {}", rank);
         List<ProfessorDTO> professors = this.professorService.findAllByRank(rank);
         return new ResponseEntity<>(professors, HttpStatus.OK);
     }
@@ -43,6 +46,7 @@ public class ProfessorResource {
      */
     @GetMapping("/get-courses/{professorId}")
     public ResponseEntity<List<String>> getCoursesByProfessor(@PathVariable long professorId) {
+        log.debug("REST request to get all courses by professor id {}", professorId);
         return new ResponseEntity<>(this.professorService.findCoursesByProfessor(professorId), HttpStatus.OK);
     }
 }
