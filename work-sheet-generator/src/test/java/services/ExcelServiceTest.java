@@ -6,10 +6,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.generator.entities.Professor;
+import org.generator.services.GroupService;
+import org.generator.services.ProfessorService;
+import org.generator.services.StudentService;
+import org.mockito.ArgumentCaptor;
 
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for the {@link ExcelService} class, focusing on verifying
@@ -250,6 +256,138 @@ public class ExcelServiceTest {
         }
     }
 
+    /**
+     * Tests reading professors and assistants from Excel.
+     * Verifies that the correct data is extracted and passed to {@link ProfessorService#save(Professor)}.
+     */
+    @Test
+    public void testReadProfessorsFromExcel_SavesAllProfessorsAndAssistants() {
+        // Arrange: Mock the professor service to observe save calls
+        ProfessorService professorService = mock(ProfessorService.class);
+        StudentService studentService = mock(StudentService.class);
+        GroupService groupService = mock(GroupService.class);
+        ExcelService localExcelService = new ExcelService(studentService, groupService, professorService);
+
+        // Act
+        localExcelService.readProfessorsFromExcel();
+
+        // Assert
+        ArgumentCaptor<Professor> captor = ArgumentCaptor.forClass(Professor.class);
+        verify(professorService, atLeastOnce()).save(captor.capture());
+
+        var savedProfessors = captor.getAllValues();
+        assertFalse(savedProfessors.isEmpty(), "Expected at least one professor to be saved.");
+
+        long countProfessors = savedProfessors.stream().filter(p -> "Profesor".equals(p.getRank())).count();
+        long countAssistants = savedProfessors.stream().filter(p -> "Asistent".equals(p.getRank())).count();
+
+        assertTrue(countProfessors > 0, "Expected at least one professor.");
+        assertTrue(countAssistants > 0, "Expected at least one assistant.");
+    }
+
+    /**
+     * Tests data consistency for professors read from Excel.
+     * Ensures names and course assignments are valid.
+     */
+    @Test
+    public void testReadProfessorsFromExcel_DataIntegrity() {
+        // Arrange
+        ProfessorService professorService = mock(ProfessorService.class);
+        StudentService studentService = mock(StudentService.class);
+        GroupService groupService = mock(GroupService.class);
+        ExcelService localExcelService = new ExcelService(studentService, groupService, professorService);
+
+        // Act
+        localExcelService.readProfessorsFromExcel();
+
+        // Assert
+        ArgumentCaptor<Professor> captor = ArgumentCaptor.forClass(Professor.class);
+        verify(professorService, atLeastOnce()).save(captor.capture());
+
+        for (Professor p : captor.getAllValues()) {
+            assertNotNull(p.getFullName(), "Professor name must not be null.");
+            assertFalse(p.getFullName().isBlank(), "Professor name must not be blank.");
+
+            assertNotNull(p.getCourses(), "Professor courses must not be null.");
+            assertFalse(p.getCourses().isEmpty(), "Professor must teach at least one course.");
+
+            assertTrue(
+                    "Profesor".equals(p.getRank()) || "Asistent".equals(p.getRank()),
+                    "Professor rank must be 'Profesor' or 'Asistent'."
+            );
+        }
+    }
+
+    /**
+     * Tests that duplicate professor entries are not saved multiple times.
+     * Assumes that professors with identical names are considered duplicates.
+     */
+    @Test
+    public void testReadProfessorsFromExcel_DuplicatesAreIgnored() {
+        ProfessorService professorService = mock(ProfessorService.class);
+        StudentService studentService = mock(StudentService.class);
+        GroupService groupService = mock(GroupService.class);
+        ExcelService localExcelService = new ExcelService(studentService, groupService, professorService);
+
+        localExcelService.readProfessorsFromExcel();
+
+        ArgumentCaptor<Professor> captor = ArgumentCaptor.forClass(Professor.class);
+        verify(professorService, atLeastOnce()).save(captor.capture());
+
+        long totalSaves = captor.getAllValues().size();
+        long uniqueNames = captor.getAllValues().stream()
+                .map(Professor::getFullName)
+                .distinct()
+                .count();
+
+        assertEquals(uniqueNames, totalSaves, "Duplicate professor entries should not be saved.");
+    }
+
+    /**
+     * Tests that the rank column in Excel is interpreted correctly.
+     * Validates that only "Profesor" or "Asistent" values are accepted.
+     */
+    @Test
+    public void testReadProfessorsFromExcel_ValidRanksOnly() {
+        ProfessorService professorService = mock(ProfessorService.class);
+        StudentService studentService = mock(StudentService.class);
+        GroupService groupService = mock(GroupService.class);
+        ExcelService localExcelService = new ExcelService(studentService, groupService, professorService);
+
+        localExcelService.readProfessorsFromExcel();
+
+        ArgumentCaptor<Professor> captor = ArgumentCaptor.forClass(Professor.class);
+        verify(professorService, atLeastOnce()).save(captor.capture());
+
+        for (Professor professor : captor.getAllValues()) {
+            String rank = professor.getRank();
+            assertTrue(
+                    rank.equals("Profesor") || rank.equals("Asistent"),
+                    "Invalid rank found: " + rank
+            );
+        }
+    }
+
+    /**
+     * Ensures that every saved professor has at least one assigned course.
+     */
+    @Test
+    public void testReadProfessorsFromExcel_CoursesNotEmpty() {
+        ProfessorService professorService = mock(ProfessorService.class);
+        StudentService studentService = mock(StudentService.class);
+        GroupService groupService = mock(GroupService.class);
+        ExcelService localExcelService = new ExcelService(studentService, groupService, professorService);
+
+        localExcelService.readProfessorsFromExcel();
+
+        ArgumentCaptor<Professor> captor = ArgumentCaptor.forClass(Professor.class);
+        verify(professorService, atLeastOnce()).save(captor.capture());
+
+        for (Professor professor : captor.getAllValues()) {
+            assertNotNull(professor.getCourses(), "Professor should have a non-null course list.");
+            assertFalse(professor.getCourses().isEmpty(), "Professor should teach at least one course.");
+        }
+    }
 
 }
 
