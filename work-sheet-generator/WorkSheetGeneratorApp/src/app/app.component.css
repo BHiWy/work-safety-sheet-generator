@@ -142,6 +142,7 @@ select {
   content: "* ";
   color: red;
 }
+
 body, html {
   height: 100%;
   margin: 0;
@@ -156,9 +157,48 @@ body, html {
   border-radius: 8px;
   box-shadow: 0 0 20px rgba(0,0,0,0.3);
 }
+
 select.custom-select:invalid {
   color: gray;
 }
+
 select.custom-select {
   color: #000;
+}
+
+input[type="date"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 1em;
+  color: #333;
+  background-color: #fff;
+}
+
+input[type="date"]:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+input[type="date"]::placeholder {
+  color: #999;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 8px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
 }

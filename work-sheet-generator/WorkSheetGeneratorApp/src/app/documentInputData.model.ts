@@ -10,7 +10,9 @@ export class DocumentInputData {
    * @param professorName The name of the professor.
    * @param courseName The name of the course.
    * @param assistantName The name of the assistant.
-   * @param place The place where the course is taken
+   * @param place The place where the course is taken.
+   * @param fromDate Date of preparation of the sheet.
+   * @param toDate Semester end date.
    * @param groups The list of groups.
    */
   constructor(
@@ -18,6 +20,8 @@ export class DocumentInputData {
     public courseName: string,
     public assistantName: string,
     public place: string,
+    public fromDate: Date,
+    public toDate: Date,
     public groups: Group[],
   ) {
   }

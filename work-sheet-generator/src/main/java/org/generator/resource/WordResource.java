@@ -42,8 +42,8 @@ public class WordResource {
     @PostMapping("")
     public void getWord(HttpServletResponse response, @RequestBody DocumentInputDataDTO inputData) throws IOException {
         log.debug("REST request to generate Word file with input data: {}", inputData);
-        ByteArrayOutputStream stream = wordService.generateWorkSheet(response, inputData);
         try{
+            ByteArrayOutputStream stream = wordService.generateWorkSheet(inputData);
             if (stream != null) {
                 response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
                 response.getOutputStream().write(stream.toByteArray());

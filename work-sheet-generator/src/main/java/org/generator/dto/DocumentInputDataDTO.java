@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -20,5 +21,7 @@ public class DocumentInputDataDTO {
     private String courseName;
     private String assistantName;
     private String place;
+    private LocalDate fromDate;
+    private LocalDate toDate;
     private List<GroupDTO> groups;
 }

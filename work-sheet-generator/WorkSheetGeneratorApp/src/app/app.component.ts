@@ -160,6 +160,12 @@ export class AppComponent implements OnInit {
     if (form.controls['place']?.errors?.['required']) {
       this.errorMessages.push('Locul desfășurării este obligatoriu.');
     }
+    if (form.controls['fromDate']?.errors?.['required']) {
+      this.errorMessages.push('Data întocmirii fișei este obligatorie.');
+    }
+    if (form.controls['toDate']?.errors?.['required']) {
+      this.errorMessages.push('Data finalului de semestru este obligatorie.');
+    }
     if (this.selectedGroups.length === 0 ){
       this.errorMessages.push('Nu ați selectat nicio grupă.');
     }
@@ -175,6 +181,8 @@ export class AppComponent implements OnInit {
       form.controls['courseName']?.value,
       form.controls['assistantName']?.value,
       form.controls['place']?.value,
+      form.controls['fromDate']?.value,
+      form.controls['toDate']?.value,
       this.selectedGroups
     );
 
