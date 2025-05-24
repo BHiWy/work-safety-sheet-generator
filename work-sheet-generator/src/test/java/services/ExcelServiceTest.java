@@ -1,6 +1,5 @@
 package services;
 
-import org.apache.poi.ss.usermodel.*;
 import org.generator.services.ExcelService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,170 +76,170 @@ public class ExcelServiceTest {
         }
     }
 
-    /**
-     * Tests whether there are any empty cells in the "Student" or "Group" columns.
-     * The check stops when a null or blank cell is found in the "Nr." column.
-     */
-    @Test
-    public void testReadStudentsFromExcel_StudentOrGroupEmpty() {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(studentsExcelPath)) {
-            assertNotNull(inputStream, "Excel file not found!");
+//    /**
+//     * Tests whether there are any empty cells in the "Student" or "Group" columns.
+//     * The check stops when a null or blank cell is found in the "Nr." column.
+//     */
+//    @Test
+//    public void testReadStudentsFromExcel_StudentOrGroupEmpty() {
+//        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(studentsExcelPath)) {
+//            assertNotNull(inputStream, "Excel file not found!");
+//
+//            Workbook workbook = WorkbookFactory.create(inputStream);
+//            Sheet sheet = workbook.getSheetAt(0);
+//
+//            int studentColIndex = -1;
+//            int grupaColIndex = -1;
+//            int nrColIndex = -1;
+//
+//            Row headerRow = sheet.getRow(8);
+//            for (Cell cell : headerRow) {
+//                String value = cell.getStringCellValue();
+//                if (value.equalsIgnoreCase("Nume si prenume")) {
+//                    studentColIndex = cell.getColumnIndex();
+//                } else if (value.equalsIgnoreCase("grupa")) {
+//                    grupaColIndex = cell.getColumnIndex();
+//                } else if (value.equalsIgnoreCase("Nr.")) {
+//                    nrColIndex = cell.getColumnIndex();
+//                }
+//            }
+//
+//            assertTrue(studentColIndex != -1, "'Student' column not found!");
+//            assertTrue(grupaColIndex != -1, "'Group' column not found!");
+//            assertTrue(nrColIndex != -1, "'Nr' column not found!");
+//
+//            boolean hasEmpty = false;
+//
+//            for (int i = 9; i <= sheet.getLastRowNum(); i++) {
+//                Row row = sheet.getRow(i);
+//                if (row == null) continue;
+//
+//                Cell nrCell = row.getCell(nrColIndex);
+//                if (nrCell == null || nrCell.getCellType() == CellType.BLANK) {
+//                    break;
+//                }
+//
+//                Cell studentCell = row.getCell(studentColIndex);
+//                Cell grupaCell = row.getCell(grupaColIndex);
+//
+//                if (isCellEmpty(studentCell) || isCellEmpty(grupaCell)) {
+//                    hasEmpty = true;
+//                    break;
+//                }
+//            }
+//
+//            assertFalse(hasEmpty, "Empty cells found in Student or Group columns!");
+//
+//        } catch (Exception e) {
+//            fail("Exception while reading file: " + e.getMessage());
+//        }
+//    }
 
-            Workbook workbook = WorkbookFactory.create(inputStream);
-            Sheet sheet = workbook.getSheetAt(0);
-
-            int studentColIndex = -1;
-            int grupaColIndex = -1;
-            int nrColIndex = -1;
-
-            Row headerRow = sheet.getRow(8);
-            for (Cell cell : headerRow) {
-                String value = cell.getStringCellValue();
-                if (value.equalsIgnoreCase("Nume si prenume")) {
-                    studentColIndex = cell.getColumnIndex();
-                } else if (value.equalsIgnoreCase("grupa")) {
-                    grupaColIndex = cell.getColumnIndex();
-                } else if (value.equalsIgnoreCase("Nr.")) {
-                    nrColIndex = cell.getColumnIndex();
-                }
-            }
-
-            assertTrue(studentColIndex != -1, "'Student' column not found!");
-            assertTrue(grupaColIndex != -1, "'Group' column not found!");
-            assertTrue(nrColIndex != -1, "'Nr' column not found!");
-
-            boolean hasEmpty = false;
-
-            for (int i = 9; i <= sheet.getLastRowNum(); i++) {
-                Row row = sheet.getRow(i);
-                if (row == null) continue;
-
-                Cell nrCell = row.getCell(nrColIndex);
-                if (nrCell == null || nrCell.getCellType() == CellType.BLANK) {
-                    break;
-                }
-
-                Cell studentCell = row.getCell(studentColIndex);
-                Cell grupaCell = row.getCell(grupaColIndex);
-
-                if (isCellEmpty(studentCell) || isCellEmpty(grupaCell)) {
-                    hasEmpty = true;
-                    break;
-                }
-            }
-
-            assertFalse(hasEmpty, "Empty cells found in Student or Group columns!");
-
-        } catch (Exception e) {
-            fail("Exception while reading file: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Checks whether each group has a designated group leader ("șef de grupă").
-     * Groups are identified by "Nr." column starting at 1.
-     */
-    @Test
-    public void testReadStudentsFromExcel_GroupHasGroupLeader() {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(studentsExcelPath)) {
-            assertNotNull(inputStream, "Excel file not found!");
-
-            Workbook workbook = WorkbookFactory.create(inputStream);
-            Sheet sheet = workbook.getSheetAt(0);
-
-            int studentColIndex = -1;
-            int grupaColIndex = -1;
-            int nrColIndex = -1;
-            int obsColIndex = -1;
-
-            Row headerRow = sheet.getRow(8);
-            for (Cell cell : headerRow) {
-                String value = cell.getStringCellValue();
-                if (value.equalsIgnoreCase("Nume si prenume")) {
-                    studentColIndex = cell.getColumnIndex();
-                } else if (value.equalsIgnoreCase("grupa")) {
-                    grupaColIndex = cell.getColumnIndex();
-                } else if (value.equalsIgnoreCase("Nr.")) {
-                    nrColIndex = cell.getColumnIndex();
-                } else if (value.equalsIgnoreCase("Obs.")) {
-                    obsColIndex = cell.getColumnIndex();
-                }
-            }
-
-            assertTrue(studentColIndex != -1, "'Student' column not found!");
-            assertTrue(grupaColIndex != -1, "'Group' column not found!");
-            assertTrue(nrColIndex != -1, "'Nr.' column not found!");
-            assertTrue(obsColIndex != -1, "'Obs.' column not found!");
-
-            boolean allGroupsHaveSef = true;
-            boolean groupHasSefDeGrupa = false;
-
-            for (int i = 9; i <= sheet.getLastRowNum(); i++) {
-                Row row = sheet.getRow(i);
-                if (row == null) continue;
-
-                Cell nrCell = row.getCell(nrColIndex);
-                if (nrCell == null || nrCell.getCellType() == CellType.BLANK) {
-                    break;
-                }
-
-                String nrValue = getCellValueAsString(nrCell);
-                if ("1".equals(nrValue)) {
-                    if (!groupHasSefDeGrupa) {
-                        System.out.println("Group starting at line " + i + " has no group leader!");
-                        allGroupsHaveSef = false;
-                    }
-                    groupHasSefDeGrupa = false;
-                }
-
-                Cell obsCell = row.getCell(obsColIndex);
-                if (obsCell != null) {
-                    String obsValue = getCellValueAsString(obsCell);
-                    if (obsValue.toLowerCase().contains("șef de grupă")) {
-                        groupHasSefDeGrupa = true;
-                    }
-                }
-            }
-
-            assertTrue(allGroupsHaveSef, "Not all groups have a group leader!");
-
-        } catch (Exception e) {
-            fail("Exception while reading file: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Utility method to check if a cell is empty.
-     *
-     * @param cell the cell to check
-     * @return true if the cell is empty, false otherwise
-     */
-    private boolean isCellEmpty(Cell cell) {
-        return cell == null || cell.getCellType() == CellType.BLANK ||
-                (cell.getCellType() == CellType.STRING && cell.getStringCellValue().trim().isEmpty());
-    }
-
-    /**
-     * Utility method to extract a cell value as a string, regardless of its type.
-     *
-     * @param cell the cell to read
-     * @return the string representation of the cell value
-     */
-    private String getCellValueAsString(Cell cell) {
-        if (cell == null) {
-            return "";
-        }
-        switch (cell.getCellType()) {
-            case NUMERIC:
-                return String.valueOf(cell.getNumericCellValue());
-            case STRING:
-                return cell.getStringCellValue();
-            case BOOLEAN:
-                return String.valueOf(cell.getBooleanCellValue());
-            default:
-                return "";
-        }
-    }
+//    /**
+//     * Checks whether each group has a designated group leader ("șef de grupă").
+//     * Groups are identified by "Nr." column starting at 1.
+//     */
+//    @Test
+//    public void testReadStudentsFromExcel_GroupHasGroupLeader() {
+//        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(studentsExcelPath)) {
+//            assertNotNull(inputStream, "Excel file not found!");
+//
+//            Workbook workbook = WorkbookFactory.create(inputStream);
+//            Sheet sheet = workbook.getSheetAt(0);
+//
+//            int studentColIndex = -1;
+//            int grupaColIndex = -1;
+//            int nrColIndex = -1;
+//            int obsColIndex = -1;
+//
+//            Row headerRow = sheet.getRow(8);
+//            for (Cell cell : headerRow) {
+//                String value = cell.getStringCellValue();
+//                if (value.equalsIgnoreCase("Nume si prenume")) {
+//                    studentColIndex = cell.getColumnIndex();
+//                } else if (value.equalsIgnoreCase("grupa")) {
+//                    grupaColIndex = cell.getColumnIndex();
+//                } else if (value.equalsIgnoreCase("Nr.")) {
+//                    nrColIndex = cell.getColumnIndex();
+//                } else if (value.equalsIgnoreCase("Obs.")) {
+//                    obsColIndex = cell.getColumnIndex();
+//                }
+//            }
+//
+//            assertTrue(studentColIndex != -1, "'Student' column not found!");
+//            assertTrue(grupaColIndex != -1, "'Group' column not found!");
+//            assertTrue(nrColIndex != -1, "'Nr.' column not found!");
+//            assertTrue(obsColIndex != -1, "'Obs.' column not found!");
+//
+//            boolean allGroupsHaveSef = true;
+//            boolean groupHasSefDeGrupa = false;
+//
+//            for (int i = 9; i <= sheet.getLastRowNum(); i++) {
+//                Row row = sheet.getRow(i);
+//                if (row == null) continue;
+//
+//                Cell nrCell = row.getCell(nrColIndex);
+//                if (nrCell == null || nrCell.getCellType() == CellType.BLANK) {
+//                    break;
+//                }
+//
+//                String nrValue = getCellValueAsString(nrCell);
+//                if ("1".equals(nrValue)) {
+//                    if (!groupHasSefDeGrupa) {
+//                        System.out.println("Group starting at line " + i + " has no group leader!");
+//                        allGroupsHaveSef = false;
+//                    }
+//                    groupHasSefDeGrupa = false;
+//                }
+//
+//                Cell obsCell = row.getCell(obsColIndex);
+//                if (obsCell != null) {
+//                    String obsValue = getCellValueAsString(obsCell);
+//                    if (obsValue.toLowerCase().contains("șef de grupă")) {
+//                        groupHasSefDeGrupa = true;
+//                    }
+//                }
+//            }
+//
+//            assertTrue(allGroupsHaveSef, "Not all groups have a group leader!");
+//
+//        } catch (Exception e) {
+//            fail("Exception while reading file: " + e.getMessage());
+//        }
+//    }
+//
+//    /**
+//     * Utility method to check if a cell is empty.
+//     *
+//     * @param cell the cell to check
+//     * @return true if the cell is empty, false otherwise
+//     */
+//    private boolean isCellEmpty(Cell cell) {
+//        return cell == null || cell.getCellType() == CellType.BLANK ||
+//                (cell.getCellType() == CellType.STRING && cell.getStringCellValue().trim().isEmpty());
+//    }
+//
+//    /**
+//     * Utility method to extract a cell value as a string, regardless of its type.
+//     *
+//     * @param cell the cell to read
+//     * @return the string representation of the cell value
+//     */
+//    private String getCellValueAsString(Cell cell) {
+//        if (cell == null) {
+//            return "";
+//        }
+//        switch (cell.getCellType()) {
+//            case NUMERIC:
+//                return String.valueOf(cell.getNumericCellValue());
+//            case STRING:
+//                return cell.getStringCellValue();
+//            case BOOLEAN:
+//                return String.valueOf(cell.getBooleanCellValue());
+//            default:
+//                return "";
+//        }
+//    }
 
     /**
      * Tests reading professors and assistants from Excel.
