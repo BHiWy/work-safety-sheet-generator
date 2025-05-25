@@ -76,7 +76,7 @@ public class GroupService {
         char secondChar = groupCode.charAt(1);
 
         if (!Character.isDigit(secondChar)) {
-            throw new IllegalArgumentException("A doua poziție din codul grupei nu este o cifră: " + groupCode);
+            throw new IllegalArgumentException("A doua pozitie din codul grupei nu este o cifra: " + groupCode);
         }
 
         return Character.getNumericValue(secondChar);

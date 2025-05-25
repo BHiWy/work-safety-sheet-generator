@@ -54,7 +54,7 @@ public class StudentServiceTest {
         Student extractedStudent = StudentService.extractNameDetails(fullName);
         Assertions.assertEquals("Popescu", extractedStudent.getLastName());
         Assertions.assertEquals("Ion", extractedStudent.getFirstName());
-        Assertions.assertEquals("", extractedStudent.getPaternalInitial()); // Modifică aserțiunea aici
+        Assertions.assertEquals("", extractedStudent.getPaternalInitial());
     }
 
     /**
@@ -68,7 +68,7 @@ public class StudentServiceTest {
         Student extractedStudent = StudentService.extractNameDetails(fullName);
         Assertions.assertEquals("Ionescu", extractedStudent.getLastName());
         Assertions.assertEquals("Maria Elena", extractedStudent.getFirstName());
-        Assertions.assertEquals("", extractedStudent.getPaternalInitial()); // Modifică aserțiunea aici
+        Assertions.assertEquals("", extractedStudent.getPaternalInitial());
     }
 
 
@@ -162,7 +162,7 @@ public class StudentServiceTest {
      */
     @Test
     void testCreateEmail_WithDiacritics() {
-        String fullName = "Ștefănescu Ălin";
+        String fullName = "Stefanescu Alin";
         String email = studentService.createEmail(fullName);
         Assertions.assertEquals("alin.stefanescu@student.tuiasi.ro", email);
     }

@@ -136,7 +136,7 @@ public class GroupServiceTest {
      */
     @Test
     void testExtractYearValid() {
-        String groupCode = "1304A";  //valid groupCode exemple
+        String groupCode = "1304A";
 
         int year = groupService.extractYear(groupCode);
 
@@ -157,7 +157,6 @@ public class GroupServiceTest {
     void testFindStudentsByGroupCode() {
         String groupCode = "1305A";
 
-        // Entități Student
         Student student1 = new Student();
         student1.setId(1L);
         student1.setFirstName("Ana");
@@ -203,7 +202,7 @@ public class GroupServiceTest {
         List<StudentDTO> result = groupService.findStudentsByGroupCode(groupCode);
 
         Assertions.assertNotNull(result);
-        Assertions.assertTrue(result.isEmpty(), "Lista de studenți ar trebui să fie goală");
+        Assertions.assertTrue(result.isEmpty(), "Lista de studenti ar trebui sa fie goala");
     }
 
     /**
@@ -279,7 +278,7 @@ public class GroupServiceTest {
 
         List<GroupDTO> result = groupService.getAll();
 
-        Assertions.assertNotNull(result, "Lista returnată nu trebuie să fie null");
-        Assertions.assertTrue(result.isEmpty(), "Lista trebuie să fie goală dacă nu există grupe");
+        Assertions.assertNotNull(result, "Lista returnata nu trebuie sa fie null");
+        Assertions.assertTrue(result.isEmpty(), "Lista trebuie sa fie goala daca nu exista grupe");
     }
 }

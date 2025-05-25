@@ -140,7 +140,7 @@ public class ExcelServiceTest {
     }
 
     /**
-     * Checks whether each group has a designated group leader ("șef de grupă").
+     * Checks whether each group has a designated group leader ("sef de grupa").
      * Groups are identified by the "Nr." column starting at value 1.
      */
     @Test
