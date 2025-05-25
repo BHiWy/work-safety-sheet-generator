@@ -25,14 +25,14 @@ public class WordServiceTest {
 
     private Group createMockGroupWithStudents(int count) {
         Group group = new Group();
-        group.setStudents(new ArrayList<>()); // Initializam lista ca sa nu fie null
+        group.setStudents(new ArrayList<>()); // Initialize the list to avoid it being null
 
         for (int i = 1; i <= count; i++) {
             Student s = new Student();
             s.setFirstName("Prenume" + i);
             s.setLastName("Nume" + i);
             s.setPaternalInitial("I" + i);
-            group.getStudents().add(s); // acum nu mai crapa
+            group.getStudents().add(s);
         }
 
         return group;
@@ -45,9 +45,9 @@ public class WordServiceTest {
     }
 
     /**
-     * Test pentru lipsa template
-     * Scop: Sa verificam ca daca template-ul lipseste sau nu poate fi citit,
-     * metoda nu arunca exceptie, ci returneaza un ByteArrayOutputStream gol.
+     * Test for missing template
+     * Purpose: To verify that if the template is missing or cannot be read,
+     * the method does not throw an exception, but returns an empty ByteArrayOutputStream.
      */
     @Test
     public void testMissingTemplateReturnsEmptyStream() throws Exception {
@@ -60,23 +60,23 @@ public class WordServiceTest {
         input.setCourseName("Test Course");
         input.setPlace("Test Room");
 
-        // Simuleaza ca metoda nu gaseste template-ul
+        // Simulate that the method cannot find the template
         WordService brokenService = new WordService(groupMapper) {
             @Override
             public ByteArrayOutputStream generateWorkSheet(DocumentInputDataDTO inputData) {
-                return new ByteArrayOutputStream(0); // mimam lipsa template-ului
+                return new ByteArrayOutputStream(0); // // mocking the absence of the template
             }
         };
 
         ByteArrayOutputStream result = brokenService.generateWorkSheet(input);
         assertNotNull(result);
-        assertEquals(0, result.size(), "Streamul ar trebui sa fie gol daca lipseste template-ul.");
+        assertEquals(0, result.size(), "The stream should be empty if the template is missing.");
     }
 
     /**
-     * Test de generare de fisa cu date valide
-     * Scop: Sa verificam ca fisierul este generat corect si nu este gol.
-     * Foloseste un grup cu 2 studenti si valideaza ca rezultatul are continut.
+     * Test for generating a report with valid data
+     * Purpose: To verify that the file is generated correctly and is not empty.
+     * Uses a group with 2 students and checks that the result has content.
      */
     @Test
     public void testValidDataGeneratesFile() throws Exception {
@@ -98,14 +98,14 @@ public class WordServiceTest {
         ByteArrayOutputStream output = wordService.generateWorkSheet(input);
 
         assertNotNull(output);
-        assertTrue(output.size() > 0, "Fisierul generat nu ar trebui sa fie gol.");
+        assertTrue(output.size() > 0, "The generated file should not be empty.");
     }
 
 
     /**
-     * Test pentru populatia tabelului cu studenti
-     * Scop: Verificam ca numarul de studenti din grup se reflecta in continutul documentului.
-     * Ne asiguram ca numele fiecarui student apare in fisierul generat.
+     * Test for populating the student table
+     * Purpose: We verify that the number of students in the group is reflected in the document content.
+     * We make sure that each student's name appears in the generated file.
      */
     @Test
     public void testStudentTablePopulationCorrectRows() throws Exception {
@@ -130,11 +130,11 @@ public class WordServiceTest {
         assertNotNull(result);
         assertTrue(result.size() > 0);
 
-        // Verificare bruta: documentul contine toate numele studentilor
+        // Crude check: the document contains all student names
         String docxContent = new String(result.toByteArray());
         for (int i = 1; i <= expectedStudents; i++) {
             assertTrue(docxContent.contains("Nume" + i),
-                    "Documentul ar trebui sa contina Nume" + i);
+                    "The document should contain the name." + i);
         }
     }
 }
