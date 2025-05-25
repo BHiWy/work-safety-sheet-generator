@@ -18,6 +18,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * This test class verifies the correct behavior of the Word document generation logic
+ *  using a predefined template. It mocks the {@link GroupMapper} dependency to simulate
+ *  student group data without relying on actual database access.
+ */
+
 public class WordServiceTest {
 
     private WordService wordService;
