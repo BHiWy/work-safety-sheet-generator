@@ -26,7 +26,7 @@ import java.util.stream.IntStream;
 @Service
 @Slf4j
 public class ExcelService {
-    private static final String studentsExcelPath = "files/grupe-an-III-AIA-2024_2025.xls";
+    private static final String studentsExcelPath = "files/grupe-an-III-AIA-2024_20255.xls";
     private static final String professorsExcelPath = "files/profesori.xls";
 
     private final StudentService studentService;

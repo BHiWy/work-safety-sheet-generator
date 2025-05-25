@@ -20,7 +20,7 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
      */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        System.out.println("Conexiune WebSocket deschisă: " + session.getId());
+        System.out.println("Conexiune WebSocket deschisa: " + session.getId());
     }
 
     /**
@@ -46,6 +46,6 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
      */
     @Override
     public void afterConnectionClosed(WebSocketSession session,@NonNull CloseStatus status) {
-        System.out.println("Conexiune închisă: " + session.getId());
+        System.out.println("Conexiune inchisa: " + session.getId());
     }
 }

@@ -29,7 +29,7 @@ public class ExcelServiceTest {
     @InjectMocks //Creates the class to be tested
     private ExcelService excelService;
 
-    private static final String studentsExcelPath = "files/grupe-an-III-AIA-2024_2025.xls";
+    private static final String studentsExcelPath = "files/grupe-an-III-AIA-2024_20255.xls";
 
     /**
      * Tests reading a valid Excel file.
@@ -201,7 +201,7 @@ public class ExcelServiceTest {
                 Cell obsCell = row.getCell(obsColIndex);
                 if (obsCell != null) {
                     String obsValue = getCellValueAsString(obsCell);
-                    if (obsValue.toLowerCase().contains("șef de grupă")) {
+                    if (obsValue.toLowerCase().contains("sef de grupa")) {
                         groupHasSefDeGrupa = true;
                     }
                 }
