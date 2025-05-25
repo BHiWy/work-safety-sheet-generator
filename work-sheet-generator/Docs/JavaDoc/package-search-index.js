@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.generator"},{"l":"org.generator.config"},{"l":"org.generator.dto"},{"l":"org.generator.entities"},{"l":"org.generator.mapper"},{"l":"org.generator.repository"},{"l":"org.generator.resource"},{"l":"org.generator.services"},{"l":"services"}];updateSearchResults();

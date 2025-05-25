@@ -1,0 +1,9 @@
+org.generator
+org.generator.config
+org.generator.dto
+org.generator.entities
+org.generator.mapper
+org.generator.repository
+org.generator.resource
+org.generator.services
+services
