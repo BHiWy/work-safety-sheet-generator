@@ -12,7 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
+/**
+ * Unit tests for the {@link StudentService} class.
+ * <p>
+ * Covers name extraction, email creation, and student persistence logic.
+ * Includes edge cases such as names with initials, diacritics, and invalid input.
+ */
 @ExtendWith(MockitoExtension.class)
 public class StudentServiceTest {
 

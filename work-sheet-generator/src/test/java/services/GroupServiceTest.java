@@ -7,6 +7,7 @@ import org.generator.dto.StudentDTO;
 import org.generator.entities.Group;
 import org.generator.entities.Student;
 import org.generator.mapper.GroupMapper;
+import org.generator.mapper.StudentMapper;
 import org.generator.repository.GroupRepository;
 import org.generator.services.GroupService;
 import org.junit.jupiter.api.Assertions;
@@ -22,6 +23,12 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the {@link GroupService} class.
+ * <p>
+ * Verifies group code validation, saving logic, student retrieval by group code,
+ * and fetching all groups from the repository.
+ */
 @ExtendWith(MockitoExtension.class)
 public class GroupServiceTest {
 
@@ -30,6 +37,9 @@ public class GroupServiceTest {
 
     @Mock
     private GroupMapper groupMapper;
+
+    @Mock
+    private StudentMapper studentMapper;
 
     @Mock
     private GroupRepository groupRepository;
@@ -147,6 +157,7 @@ public class GroupServiceTest {
     void testFindStudentsByGroupCode() {
         String groupCode = "1305A";
 
+        // Entități Student
         Student student1 = new Student();
         student1.setId(1L);
         student1.setFirstName("Ana");
@@ -157,6 +168,15 @@ public class GroupServiceTest {
 
         List<Student> studentList = Arrays.asList(student1, student2);
         when(groupRepository.findDistinctStudentsByGroupCode(groupCode)).thenReturn(studentList);
+
+        StudentDTO dto1 = new StudentDTO();
+        dto1.setFirstName("Ana");
+
+        StudentDTO dto2 = new StudentDTO();
+        dto2.setFirstName("Ion");
+
+        when(studentMapper.toDTO(student1)).thenReturn(dto1);
+        when(studentMapper.toDTO(student2)).thenReturn(dto2);
 
         List<StudentDTO> result = groupService.findStudentsByGroupCode(groupCode);
 
@@ -227,6 +247,15 @@ public class GroupServiceTest {
 
         List<Group> groupList = Arrays.asList(group1, group2);
         when(groupRepository.findAll()).thenReturn(groupList);
+
+        GroupDTO dto1 = new GroupDTO();
+        dto1.setCode("1305A");
+
+        GroupDTO dto2 = new GroupDTO();
+        dto2.setCode("1306B");
+
+        when(groupMapper.toDTO(group1)).thenReturn(dto1);
+        when(groupMapper.toDTO(group2)).thenReturn(dto2);
 
         List<GroupDTO> result = groupService.getAll();
 
