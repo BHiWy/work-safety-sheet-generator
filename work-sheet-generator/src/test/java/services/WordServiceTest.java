@@ -31,7 +31,7 @@ public class WordServiceTest {
 
     private Group createMockGroupWithStudents(int count) {
         Group group = new Group();
-        group.setStudents(new ArrayList<>()); // Initialize the list to avoid it being null
+        group.setStudents(new ArrayList<>());
 
         for (int i = 1; i <= count; i++) {
             Student s = new Student();
@@ -66,11 +66,10 @@ public class WordServiceTest {
         input.setCourseName("Test Course");
         input.setPlace("Test Room");
 
-        // Simulate that the method cannot find the template
         WordService brokenService = new WordService(groupMapper) {
             @Override
             public ByteArrayOutputStream generateWorkSheet(DocumentInputDataDTO inputData) {
-                return new ByteArrayOutputStream(0); // // mocking the absence of the template
+                return new ByteArrayOutputStream(0);
             }
         };
 
