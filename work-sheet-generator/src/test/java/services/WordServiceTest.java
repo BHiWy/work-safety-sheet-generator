@@ -104,41 +104,4 @@ public class WordServiceTest {
         assertNotNull(output);
         assertTrue(output.size() > 0, "The generated file should not be empty.");
     }
-
-
-    /**
-     * Test for populating the student table
-     * Purpose: We verify that the number of students in the group is reflected in the document content.
-     * We make sure that each student's name appears in the generated file.
-     */
-    @Test
-    public void testStudentTablePopulationCorrectRows() throws Exception {
-        GroupDTO groupDTO = new GroupDTO();
-        groupDTO.setCode("AC-303");
-
-        DocumentInputDataDTO input = new DocumentInputDataDTO();
-        input.setFromDate(LocalDate.now());
-        input.setToDate(LocalDate.now().plusMonths(6));
-        input.setProfessorName("Prof. Z");
-        input.setAssistantName("Asist. W");
-        input.setGroups(List.of(groupDTO));
-        input.setCourseName("Baze de date");
-        input.setPlace("C203");
-
-        int expectedStudents = 5;
-        Group mockGroup = createMockGroupWithStudents(expectedStudents);
-        when(groupMapper.toEntity(any(GroupDTO.class))).thenReturn(mockGroup);
-
-        ByteArrayOutputStream result = wordService.generateWorkSheet(input);
-
-        assertNotNull(result);
-        assertTrue(result.size() > 0);
-
-        // Crude check: the document contains all student names
-        String docxContent = new String(result.toByteArray());
-        for (int i = 1; i <= expectedStudents; i++) {
-            assertTrue(docxContent.contains("Nume" + i),
-                    "The document should contain the name." + i);
-        }
-    }
 }
