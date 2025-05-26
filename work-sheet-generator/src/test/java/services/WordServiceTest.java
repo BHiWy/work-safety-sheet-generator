@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
  *  using a predefined template. It mocks the {@link GroupMapper} dependency to simulate
  *  student group data without relying on actual database access.
  */
-
 public class WordServiceTest {
 
     private WordService wordService;
